@@ -64,7 +64,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Prerequisites.ps1" />
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SP2016.Repository\SP2016.Repository.csproj">

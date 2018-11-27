@@ -10,4 +10,4 @@ Before running the tests you need to create some lists. You can do this by runni
 .\Prerequisites.ps1 -WebUrl <YOUR_WEB_URL>
 ```
 
-Also, you have to replace the WebUrl property in the BaseRepoTest class. 
+Also, you have to replace the WebUrl property in the BaseRepoTest class.
