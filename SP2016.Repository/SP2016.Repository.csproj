@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F657E2D1-49B5-4642-909E-BC14A488C0A2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SP2016.Repository</RootNamespace>
+    <AssemblyName>SP2016.Repository</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>sp2016repo.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SharePoint.Taxonomy, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Converters\BaseSharePointConverter.cs" />
+    <Compile Include="Batch\Batch.cs" />
+    <Compile Include="Batch\Method.cs" />
+    <Compile Include="Batch\ResultEntry.cs" />
+    <Compile Include="Batch\Results.cs" />
+    <Compile Include="Batch\SetFieldValue.cs" />
+    <Compile Include="Batch\SetList.cs" />
+    <Compile Include="Converters\AfterPropertiesStringValueConverter.cs" />
+    <Compile Include="Converters\BatchStringValueConverter.cs" />
+    <Compile Include="Converters\CalendarReccurenceDataConverter.cs" />
+    <Compile Include="Converters\ItemVersionDateTimeConverter.cs" />
+    <Compile Include="Converters\SPContentTypeIdValueConverter.cs" />
+    <Compile Include="Converters\SPContentTypeValueConverter.cs" />
+    <Compile Include="Converters\SPFieldCalculatedValueConverter.cs" />
+    <Compile Include="Converters\SPFieldLookupConverter.cs" />
+    <Compile Include="Converters\SPFieldMultiChoiceValueConverter.cs" />
+    <Compile Include="Converters\SPFieldUrlValueConverter.cs" />
+    <Compile Include="Converters\SPFieldUserConverter.cs" />
+    <Compile Include="Converters\SPFieldUserValueCollectionConverter.cs" />
+    <Compile Include="Converters\SPPrincipalConverter.cs" />
+    <Compile Include="Converters\SPPrincipalInfoConverter.cs" />
+    <Compile Include="Converters\XmlDateTimeFieldValueConverter.cs" />
+    <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="FieldToEntityPropertyMappingComparer.cs" />
+    <Compile Include="Models\EntityContainer.cs" />
+    <Compile Include="ISharePointRepository.cs" />
+    <Compile Include="Mapping\ISPFieldToPropertyMapper.cs" />
+    <Compile Include="Utils\AllowUnsafeUpdates.cs" />
+    <Compile Include="Utils\BatchUtil.cs" />
+    <Compile Include="Utils\ItemFieldsChecking.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BaseEntityRepository.cs" />
+    <Compile Include="Caml\CamlFilter.cs" />
+    <Compile Include="Caml\CamlQueryBuilder.cs" />
+    <Compile Include="Caml\RepositoryCamlBuilder.cs" />
+    <Compile Include="Caml\ComplexExpression.cs" />
+    <Compile Include="Caml\DateTimeValue.cs" />
+    <Compile Include="Caml\DateTimeValues.cs" />
+    <Compile Include="Caml\FieldReference.cs" />
+    <Compile Include="Caml\FieldReferenceBase.cs" />
+    <Compile Include="Caml\Filter.cs" />
+    <Compile Include="Caml\FilterType.cs" />
+    <Compile Include="Caml\FilterValueType.cs" />
+    <Compile Include="Caml\IExpression.cs" />
+    <Compile Include="Caml\ListsReference.cs" />
+    <Compile Include="Caml\MembershipFilter.cs" />
+    <Compile Include="Caml\MembershipFilterType.cs" />
+    <Compile Include="Caml\Operator.cs" />
+    <Compile Include="Caml\ParameterBindingValue.cs" />
+    <Compile Include="Caml\Query.cs" />
+    <Compile Include="Caml\SimpleCamlBuilder.cs" />
+    <Compile Include="Caml\SiteQuery.cs" />
+    <Compile Include="Caml\SiteQueryFieldReference.cs" />
+    <Compile Include="Caml\SiteQueryWebScopes.cs" />
+    <Compile Include="Caml\SortOrder.cs" />
+    <Compile Include="Constants\Constants.cs" />
+    <Compile Include="Utils\CustomizedComparer.cs" />
+    <Compile Include="Converters\Default\BaseConverter.cs" />
+    <Compile Include="Converters\Default\BooleanConverter.cs" />
+    <Compile Include="Converters\Default\DateTimeConverter.cs" />
+    <Compile Include="Converters\Default\DoubleConverter.cs" />
+    <Compile Include="Converters\Default\EnumConverter.cs" />
+    <Compile Include="Converters\Default\GuidConverter.cs" />
+    <Compile Include="Converters\Default\Int32Converter.cs" />
+    <Compile Include="Converters\Default\SingleConverter.cs" />
+    <Compile Include="Converters\Default\StringValueConverter.cs" />
+    <Compile Include="Attributes\FieldMappingAttribute.cs" />
+    <Compile Include="IBaseEntityRepository.cs" />
+    <Compile Include="IBaseRepository.cs" />
+    <Compile Include="Mapping\ListItemFieldMappingException.cs" />
+    <Compile Include="Mapping\FieldToPropertyMapper.cs" />
+    <Compile Include="Mapping\FieldToEntityPropertyMapping.cs" />
+    <Compile Include="Entities\IEntity.cs" />
+    <Compile Include="Mapping\IListItemFieldMapper.cs" />
+    <Compile Include="Utils\ReflectionUtil.cs" />
+    <Compile Include="Logging\ILog.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Constants\SPConstants.cs" />
+    <Compile Include="Utils\DisabledItemEventsScope.cs" />
+    <Compile Include="Models\CalendarReccurenceData.cs" />
+    <Compile Include="Converters\ReccurenceDataConverter.cs" />
+    <Compile Include="Service\FolderService.cs" />
+    <Compile Include="Service\ListItemService.cs" />
+    <Compile Include="Models\SPPrincipalInfo.cs" />
+    <Compile Include="Service\ListService.cs" />
+    <Compile Include="SPFieldCalculatedValue.cs" />
+    <Compile Include="Mapping\SPFieldToPropertyMapper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="obj\Debug\SP2016.Repository.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\SP2016.Repository.csprojAssemblyReference.cache" />
+    <None Include="sp2016repo.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
+    <Folder Include="bin\Release\" />
+    <Folder Include="obj\Debug\TempPE\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
