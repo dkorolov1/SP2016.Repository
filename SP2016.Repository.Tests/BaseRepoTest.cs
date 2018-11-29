@@ -8,7 +8,7 @@ namespace SP2016.Repository.Tests
     {
         protected UsersRepository UsersRepository { get; private set; }
         protected DepartmentsRepository DepartmentsRepository { get; private set; }
-        protected virtual string WebUrl => "http://wm-windows2012r:45115/sites/dev/";
+        protected virtual string WebUrl => "http://wm-windows2012r/training/";
 
         protected MockUsers MockUsers { get; private set; }
         protected MockDepartments MockDepartments { get; private set; }
