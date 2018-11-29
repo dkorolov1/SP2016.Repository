@@ -64,17 +64,7 @@ namespace SP2016.Repository
         /// </summary>
         /// <param name="web">Узел</param>
         /// <returns>Массив сущностей</returns>
-        public TEntity[] GetAllEntities(SPWeb web)
-        {
-            return GetAllEntities(web, true);
-        }
-
-        /// <summary>
-        /// Получить все сущности
-        /// </summary>
-        /// <param name="web">Узел</param>
-        /// <returns>Массив сущностей</returns>
-        public TEntity[] GetAllEntities(SPWeb web, bool recursive = false)
+        public TEntity[] GetAllEntities(SPWeb web, bool recursive = true)
         {
             CamlQueryBuilder builder = new CamlQueryBuilder();
             SPQuery query = builder.Build();
@@ -94,8 +84,11 @@ namespace SP2016.Repository
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         private TEntity[] GetEntities(SPWeb web, string caml, bool recursive, uint rowLimit = 0)
         {
-            SPQuery query = new SPQuery();
-            query.Query = caml;
+            var query = new SPQuery
+            {
+                Query = caml
+            };
+
             if (recursive)
                 query.ViewAttributes = "Scope=\"Recursive\"";
             if (rowLimit > 0)
@@ -150,13 +143,15 @@ namespace SP2016.Repository
         {
             TEntity entity = default(TEntity);
 
-            SPQuery query = new SPQuery();
-            query.Query = caml;
+            var query = new SPQuery
+            {
+                Query = caml
+            };
 
             SPListItem item = null;
             SPListItemCollection collection = null;
 
-            collection = web.Lists[this.ListName].GetItems(query);
+            collection = web.Lists[ListName].GetItems(query);
 
             if (collection != null && collection.Count > 0)
             {
@@ -165,7 +160,7 @@ namespace SP2016.Repository
 
             if (item != null)
             {
-                entity = this.CreateEntity(web, item);
+                entity = CreateEntity(web, item);
             }
 
             return entity;
@@ -179,17 +174,18 @@ namespace SP2016.Repository
         /// <returns>Сущности</returns>
         public TEntity[] GetEntities(SPWeb web, string folderPath)
         {
-            SPList list = web.Lists[this.ListName];
-            string url = SPUtility.ConcatUrls(list.RootFolder.ServerRelativeUrl, folderPath);
+            var list = web.Lists[ListName];
+            var url = SPUtility.ConcatUrls(list.RootFolder.ServerRelativeUrl, folderPath);
 
-            FolderService folderService = new FolderService();
-            SPFolder folder = folderService.GetFolderByUrl(web, list, folderPath);
+            var folderService = new FolderService();
+            var folder = folderService.GetFolderByUrl(web, list, folderPath);
+
             if (folder == null)
             {
                 return new TEntity[0];
             }
 
-            SPQuery query = new SPQuery { Folder = folder };
+            var query = new SPQuery { Folder = folder };
             return GetEntities(web, query);
         }
 
@@ -201,9 +197,12 @@ namespace SP2016.Repository
         /// <returns>Сущности</returns>
         public TEntity[] GetEntities(SPWeb web, Query query, uint rowLimit = 0)
         {
-            RepositoryCamlBuilder<TEntity> camlBuilder = new RepositoryCamlBuilder<TEntity>();
-            camlBuilder.FieldCollection = web.Lists[ListName].Fields;
-            camlBuilder.ListItemFieldMapper = ListItemFieldMapper;
+            var camlBuilder = new RepositoryCamlBuilder<TEntity>
+            {
+                FieldCollection = web.Lists[ListName].Fields,
+                ListItemFieldMapper = ListItemFieldMapper
+            };
+
             string caml = camlBuilder.BuildCaml(query);
             return GetEntities(web, caml, query.Recursive, rowLimit);
         }
@@ -217,7 +216,12 @@ namespace SP2016.Repository
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         public TEntity[] GetEntities(SPWeb web, IExpression expr, bool recursive, uint rowLimit = 0)
         {
-            Query query = new Query() { Where = expr, Recursive = recursive };
+            var query = new Query
+            {
+                Where = expr,
+                Recursive = recursive
+            };
+
             return GetEntities(web, query, rowLimit);
         }
 
@@ -230,7 +234,12 @@ namespace SP2016.Repository
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         public TEntity[] GetEntities(SPWeb web, object expr, uint rowLimit = 0)
         {
-            Query query = new Query() { Where = (IExpression)expr, Recursive = true };
+            var query = new Query
+            {
+                Where = (IExpression)expr,
+                Recursive = true
+            };
+
             return GetEntities(web, query, rowLimit);
         }
 
@@ -242,7 +251,8 @@ namespace SP2016.Repository
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         public TEntity[] GetEntities(SPWeb web, SPQuery query)
         {
-            SPListItemCollection collection = web.Lists[this.ListName].GetItems(query);
+            var collection = web.Lists[ListName].GetItems(query);
+
             return collection
                 .Cast<SPListItem>()
                 .Select(item => CreateEntity(web, item))
@@ -252,20 +262,6 @@ namespace SP2016.Repository
         #endregion
 
         #region Создание сущностей из объектов SharePoint
-
-        /// <summary>
-        /// Получение сущности по AfterProperties
-        /// </summary>
-        /// <param name="properties">Свойства из методов ItemAdding или ItemUpdating</param>
-        /// <param name="web">Узел, с которого необходимо получить сущность</param>
-        /// <returns>Сущность с заполненными свойствами</returns>
-        public TEntity GetEntity(SPWeb web, SPItemEventProperties properties)
-        {
-            TEntity entity = default(TEntity);
-            SPList list = web.Lists[this.ListName];
-            entity = this.CreateEntity(web, properties);
-            return entity;
-        }
 
         /// <summary>
         /// Заполнить сущность значениями элемента списка
@@ -283,12 +279,19 @@ namespace SP2016.Repository
             return entity;
         }
 
+
+        public TEntity CreateEntity(SPWeb web, SPItemEventProperties properties)
+        {
+            return CreateEntity(web, properties.ListItem);
+        }
+
         /// <summary>
-        /// Заполнить сущность значениями AfterProperties
+        /// 
         /// </summary>
-        /// <param name="item">Элемент списка</param>
-        /// <returns>Сущность с заполненными свойствами</returns>
-        public virtual TEntity CreateEntity(SPWeb web, SPItemEventProperties properties)
+        /// <param name="web"></param>
+        /// <param name="properties"></param>
+        /// <returns></returns>
+        public virtual TEntity CreateEntityFromAfterProperties(SPWeb web, SPItemEventProperties properties)
         {
             TEntity entity = new TEntity();
             Type entityType = typeof(TEntity);
@@ -485,7 +488,7 @@ namespace SP2016.Repository
         /// <param name="entity">Сущность с данными для добавления</param>
         /// <param name="web">Узел, на который необходимо добавить информацию</param>
         /// <returns>Идентификатор созданного элемента</returns>
-        public void AddListItem(SPWeb web, TEntity entity)
+        private void AddListItem(SPWeb web, TEntity entity)
         {
             SPListItem newItem = web.Lists[this.ListName].Items.Add();
             UpdateListItemInternal(web, entity, newItem);
@@ -565,7 +568,7 @@ namespace SP2016.Repository
             }
         }
 
-        public void AddListItemToFolder(SPWeb web, string folderListRelativeUrl, TEntity entity)
+        private void AddListItemToFolder(SPWeb web, string folderListRelativeUrl, TEntity entity)
         {
             SPList list = web.Lists[this.ListName];
             string url = SPUtility.ConcatUrls(list.RootFolder.ServerRelativeUrl, folderListRelativeUrl);
@@ -1298,7 +1301,7 @@ namespace SP2016.Repository
         {
             SPList workList = this.GetList(web);
             string formUrl = workList.Forms[pagetype].ServerRelativeUrl;
-            return string.Format("{0}?ID={1}", formUrl, id);
+            return $"{formUrl}?ID={id}";
         }
 
         #endregion

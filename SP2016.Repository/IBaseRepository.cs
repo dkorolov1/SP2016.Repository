@@ -29,7 +29,7 @@
         /// </summary>
         /// <param name="context">Узел, с которого необходимо получить коллекцию</param>
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
-        TEntity[] GetAllEntities(TContext context);
+        TEntity[] GetAllEntities(TContext context, bool recursive);
 
         /// <summary>
         /// Удалить сущность
