@@ -1,6 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SP2016.Repository.Caml;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SP2016.Repository.Tests
@@ -120,6 +118,58 @@ namespace SP2016.Repository.Tests
                 finally
                 {
                     UsersRepository.DeleteAll(web);
+                }
+            });
+        }
+
+        [TestMethod]
+        public void GetEntitiesByTitle_WithSpecificTitle_RightItem()
+        {
+            Perform(web =>
+            {
+                try
+                {
+                    UsersRepository.AddRange(web, MockUsers.AllUsers);
+
+                    var developer = UsersRepository.GetEntitiesByTitle(web, MockUsers.User1.DisplayName);
+
+                    Assert.IsTrue(developer.All(d => d.DisplayName == MockUsers.User1.DisplayName));
+
+                }
+                finally
+                {
+                    UsersRepository.DeleteAll(web);
+                }
+            });
+        }
+
+        [TestMethod]
+        public void GetEntitiesByTitle_WithSpecificTitleAndRowLimit_RightItem()
+        {
+            Perform(web =>
+            {
+                var folderName = "Fresh people";
+
+                try
+                {
+                    UsersRepository.Add(web, folderName, MockUsers.User2);
+                    UsersRepository.Add(web, folderName, MockUsers.User3);
+
+                    uint rowLimit = 1;
+                    var developers = UsersRepository.GetEntitiesByTitle(web, MockUsers.User2.DisplayName, true, rowLimit);
+
+                    Assert.IsTrue(rowLimit == developers.Length,
+                        $"Recived {developers.Length} developers while row limit is {rowLimit}");
+
+                    Assert.IsTrue(
+                        developers[0].DisplayName == MockUsers.User2.DisplayName ||
+                        developers[0].DisplayName == MockUsers.User2.DisplayName);
+
+                }
+                finally
+                {
+                    UsersRepository.DeleteAll(web);
+                    UsersRepository.DeleteFolder(web, folderName);
                 }
             });
         }
