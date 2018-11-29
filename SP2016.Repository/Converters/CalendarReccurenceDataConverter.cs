@@ -16,9 +16,9 @@ namespace SP2016.Repository.Converters
 
         public override object ConvertFieldValueToPropertyValue(object fieldValue)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(CalendarReccurenceData), String.Empty);
+            XmlSerializer serializer = new XmlSerializer(typeof(CalendarReccurenceData), string.Empty);
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-            ns.Add(String.Empty, String.Empty);
+            ns.Add(string.Empty, string.Empty);
 
             byte[] bytes = Encoding.UTF8.GetBytes(fieldValue.ToString());
             using (MemoryStream memStream = new MemoryStream(bytes))

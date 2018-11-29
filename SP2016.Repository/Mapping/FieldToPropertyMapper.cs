@@ -50,7 +50,8 @@ namespace SP2016.Repository.Mapping
             if (defaultConvertersByNameMapping.ContainsKey(propertyInfo.Name))
                 return defaultConvertersByNameMapping[propertyInfo.Name];
 
-            BaseConverter converter = TryGetConverterFromAttribute(propertyInfo) ?? GetConverterByPropertyType(propertyInfo, customConvertersMapping);
+            BaseConverter converter = TryGetConverterFromAttribute(propertyInfo) ?? 
+                GetConverterByPropertyType(propertyInfo, customConvertersMapping);
 
             if (converter != null)
                 converter.PropertyInfo = propertyInfo;
