@@ -57,7 +57,7 @@ namespace SP2016.Repository
             ListItemFieldMapper = new SPFieldToPropertyMapper(allFieldMappings);
         }
 
-        #region Получение всех сущностей
+        #region Getting all entities without filtering
 
         /// <summary>
         /// Получить все сущности
@@ -73,7 +73,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Фильтры
+        #region Getting entities with filtering
 
         /// <summary>
         /// Получение коллекции сущностей
@@ -261,7 +261,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Создание сущностей из объектов SharePoint
+        #region Initiating entities from SharePoint objects
 
         /// <summary>
         /// Заполнить сущность значениями элемента списка
@@ -286,11 +286,11 @@ namespace SP2016.Repository
         }
 
         /// <summary>
-        /// 
+        /// Primary used in SomethingUpdating event receivers.
         /// </summary>
         /// <param name="web"></param>
-        /// <param name="properties"></param>
-        /// <returns></returns>
+        /// <param name="properties">Event receiver properties object</param>
+        /// <returns>Entity with new data</returns>
         public virtual TEntity CreateEntityFromAfterProperties(SPWeb web, SPItemEventProperties properties)
         {
             TEntity entity = new TEntity();
@@ -318,34 +318,24 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Последние сущности
+        #region First and last entities
 
-        /// <summary>
-        /// Получить последнюю сущность
-        /// </summary>
-        /// <param name="web">Узел, с которого необходимо получить сущность</param>
-        /// <returns></returns>
-        public TEntity GetLastEntity(SPWeb web)
+        private TEntity[] GetFirstOrLastEntities(SPWeb web, uint numberOfEntities, SortOrder sortOrder)
         {
             Query query = new Query();
-            query.OrderBy.Add(new FieldReference("ID", SortOrder.Descending));
+            query.OrderBy.Add(new FieldReference("ID", sortOrder));
 
-            return GetEntities(web, query, 1).FirstOrDefault();
+            return GetEntities(web, query, numberOfEntities);
         }
 
-        /// <summary>
-        /// Получить ID последней сущности или 0
-        /// </summary>
-        /// <param name="web">Узел, с которого необходимо получить сущность</param>
-        /// <returns></returns>
-        public int GetLastEntityId(SPWeb web)
+        public TEntity[] GetFirstEntities(SPWeb web, uint numberOfEntities)
         {
-            TEntity entity = GetLastEntity(web);
+            return GetFirstOrLastEntities(web, numberOfEntities, SortOrder.Ascending);
+        }
 
-            if (entity != null)
-                return entity.ID;
-            else
-                return 0;
+        public TEntity[] GetLastEntities(SPWeb web, uint numberOfEntities)
+        {
+            return GetFirstOrLastEntities(web, numberOfEntities, SortOrder.Descending);
         }
 
         #endregion
