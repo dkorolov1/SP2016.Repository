@@ -17,16 +17,21 @@ namespace SP2016.Repository.Tests
         public void GetAllEntities_Recursive_SameItemsAmount()
         {
             Perform(web => {
-                string folderName = "New Employees";
+                var folderName = "New Employees";
 
-                UsersRepository.AddRange(web, MockUsers.AllUsers);
-                UsersRepository.Add(web, folderName, MockUsers.User1);
-                var items = UsersRepository.GetAllEntities(web);
+                try
+                {
+                    UsersRepository.AddRange(web, MockUsers.AllUsers);
+                    UsersRepository.Add(web, folderName, MockUsers.User1);
+                    var items = UsersRepository.GetAllEntities(web);
 
-                Assert.AreEqual(items.Length, MockUsers.AllUsers.Length + 1);
-
-                UsersRepository.DeleteAll(web);
-                UsersRepository.DeleteFolder(web, folderName);
+                    Assert.AreEqual(items.Length, MockUsers.AllUsers.Length + 1);
+                }
+                finally
+                {
+                    UsersRepository.DeleteAll(web);
+                    UsersRepository.DeleteFolder(web, folderName);
+                }
             });
         }
 
@@ -37,12 +42,17 @@ namespace SP2016.Repository.Tests
         public void GetAllEntities_NotRecursive_SameItemsAmount()
         {
             Perform(web => {
-                UsersRepository.AddRange(web, MockUsers.AllUsers);
-                var items = UsersRepository.GetAllEntities(web, false);
+                try
+                {
+                    UsersRepository.AddRange(web, MockUsers.AllUsers);
+                    var items = UsersRepository.GetAllEntities(web, false);
 
-                Assert.AreEqual(items.Length, MockUsers.AllUsers.Length);
-
-                UsersRepository.DeleteAll(web);
+                    Assert.AreEqual(items.Length, MockUsers.AllUsers.Length);
+                }
+                finally
+                {
+                    UsersRepository.DeleteAll(web);
+                }
             });
         }
     }
