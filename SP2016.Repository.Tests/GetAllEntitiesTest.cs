@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
 
 namespace SP2016.Repository.Tests
 {
@@ -15,16 +14,16 @@ namespace SP2016.Repository.Tests
         /// Check for GetAllEntities(SPWeb web, bool recursive = false)
         /// </summary>
         [TestMethod]
-        public void GetAllEntitiesRecursiveTest()
+        public void GetAllEntities_Recursive_SameItemsAmount()
         {
             Perform(web => {
                 string folderName = "New Employees";
 
                 UsersRepository.AddRange(web, MockUsers.AllUsers);
-                UsersRepository.AddListItemToFolder(web, folderName, MockUsers.User1);
-                var items = UsersRepository.GetAllEntities(web, true);
+                UsersRepository.Add(web, folderName, MockUsers.User1);
+                var items = UsersRepository.GetAllEntities(web);
 
-                Debug.Assert(items.Length == MockUsers.AllUsers.Length + 1);
+                Assert.AreEqual(items.Length, MockUsers.AllUsers.Length + 1);
 
                 UsersRepository.DeleteAll(web);
                 UsersRepository.DeleteFolder(web, folderName);
@@ -35,13 +34,13 @@ namespace SP2016.Repository.Tests
         /// Check GetAllEntities(SPWeb web)
         /// </summary>
         [TestMethod]
-        public void GetAllEntitiesTest()
+        public void GetAllEntities_NotRecursive_SameItemsAmount()
         {
             Perform(web => {
                 UsersRepository.AddRange(web, MockUsers.AllUsers);
-                var items = UsersRepository.GetAllEntities(web);
+                var items = UsersRepository.GetAllEntities(web, false);
 
-                Debug.Assert(items.Length == MockUsers.AllUsers.Length);
+                Assert.AreEqual(items.Length, MockUsers.AllUsers.Length);
 
                 UsersRepository.DeleteAll(web);
             });
