@@ -1,5 +1,5 @@
 ﻿namespace SP2016.Repository
-{
+{ 
     public interface IBaseRepository<in TContext, TEntity> where TEntity : new()
     {
         /// <summary>
