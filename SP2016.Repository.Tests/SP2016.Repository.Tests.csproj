@@ -29,6 +29,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -59,8 +60,10 @@
     <Compile Include="Data\Users\Seniority.cs" />
     <Compile Include="Data\Users\UserEntity.cs" />
     <Compile Include="Data\Users\UsersRepository.cs" />
+    <Compile Include="EntityCreationTests.cs" />
     <Compile Include="FiltersTests.cs" />
     <Compile Include="GetAllEntitiesTest.cs" />
+    <Compile Include="GetLastEntitiesTests.cs" />
     <Compile Include="Mock\MockDepartments.cs" />
     <Compile Include="Mock\MockUsers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
