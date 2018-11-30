@@ -4,7 +4,6 @@ using SP2016.Repository.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Security.Permissions;
@@ -37,9 +36,10 @@ namespace SP2016.Repository.Mapping
             defaultConvertersByTypeMapping[typeof(SPContentType)] = new SPContentTypeValueConverter();
         }
         
-        public SPFieldToPropertyMapper(FieldToEntityPropertyMapping[] mappings) : this()
+        public SPFieldToPropertyMapper(params FieldToPropertyMapping[] mappings) 
+            : this()
         {
-            AddMapping(mappings);
+            Mappings.AddRange(mappings);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace SP2016.Repository.Mapping
         public string GetFieldDisplayName(string propertyName)
         {
             string displayName = string.Empty;
-            foreach (FieldToEntityPropertyMapping mapping in fieldMappings)
+            foreach (var mapping in Mappings)
             {
                 if (mapping.EntityPropertyName.Equals(propertyName))
                 {
@@ -62,28 +62,6 @@ namespace SP2016.Repository.Mapping
                 throw new InvalidOperationException(string.Format("Не найдено соответствие для свойства {0}.", propertyName));
 
             return displayName;
-        }
-
-        /// <summary>
-        /// Получить название свойства сущности соответствующего имени поля.
-        /// </summary>
-        /// <param name="displayName"></param>
-        /// <returns></returns>
-        public string GetPropertyNameByFieldDisplayName(string displayName)
-        {
-            string propertyName = string.Empty;
-            foreach (FieldToEntityPropertyMapping mapping in fieldMappings)
-            {
-                if (mapping.FieldName.Equals(displayName))
-                {
-                    propertyName = mapping.EntityPropertyName;
-                    break;
-                }
-            }
-            if (string.IsNullOrEmpty(propertyName))
-                throw new InvalidOperationException(string.Format("Не найдено соответствие для поля {0}.", displayName));
-
-            return propertyName;
         }
 
         #region Entity <-> Item
@@ -98,7 +76,7 @@ namespace SP2016.Repository.Mapping
         {
             StringBuilder builder = new StringBuilder();
 
-            foreach (FieldToEntityPropertyMapping fieldMapping in fieldMappings)
+            foreach (FieldToPropertyMapping fieldMapping in Mappings)
             {
                 if (!fieldMapping.ReadOnly)
                 {
@@ -119,16 +97,163 @@ namespace SP2016.Repository.Mapping
             return builder.ToString();
         }
 
+        private IEnumerable<Tuple<string, object>> FieldNamesToValues(SPWeb web, SPList list, Type entityType, object entity)
+        {
+            foreach (var mapping in Mappings)
+            {
+                if (!mapping.ReadOnly)
+                {
+                    SPField field = ItemFieldsChecking.EnsureListFieldID(list, entityType, mapping);
+
+                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(entityType, mapping);
+                    object propertyValue = propertyInfo.GetValue(entity, null);
+                    object fieldValue = null;
+
+                    if (propertyValue != null && !string.IsNullOrEmpty(propertyValue.ToString()))
+                    {
+                        var converter = GetAfterPropertiesFieldValuesConverter(web, propertyInfo, field);
+                        fieldValue = converter.ConvertPropertyValueToFieldValue(propertyValue);
+                    }
+                    yield return Tuple.Create(field.InternalName, propertyValue);
+                }
+            }
+        }
+
+
+
+
+        /// <summary>
+        /// Заполнить AfterProperties на основе данных сущности
+        /// </summary>
+        /// <param name="properties"></param>
+        /// <param name="entity">Сущность с данными</param>
+        [SharePointPermissionAttribute(SecurityAction.LinkDemand, ObjectModel = true)]
+        public void FillAfterPropertiesFromEntity(SPWeb web, SPItemEventProperties properties, Type entityType, object entity)
+        {
+            //Type entityType = typeof(TEntity);
+            foreach (var mapping in Mappings)
+            {
+                if (!mapping.ReadOnly)
+                {
+                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(entityType, mapping);
+                    SPField field = ItemFieldsChecking.EnsureListFieldID(properties.List, entityType, mapping);
+
+                    object propertyValue = propertyInfo.GetValue(entity, null);
+                    object fieldValue;
+
+                    if (propertyValue == null || string.IsNullOrEmpty(propertyValue.ToString()))
+                        fieldValue = null;
+                    else
+                        fieldValue = GetAfterPropertiesFieldValuesConverter(web, propertyInfo, field).ConvertPropertyValueToFieldValue(propertyValue);
+
+                    try
+                    {
+                        properties.AfterProperties[mapping.FieldName] = fieldValue;
+                    }
+                    catch (Exception ex)
+                    {
+                        string errorMessage = $@"Не удалось записать значение {fieldValue} в поле {mapping.FieldName} 
+                                для сущности {entityType.FullName}.";
+
+                        var nextException = new Exception(errorMessage, ex);
+                        logger.Error(errorMessage, nextException);
+                        throw nextException;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Заполнить SPListItem на основе данных сущности
+        /// </summary>
+        /// <param name="spListItem">Элемент списка</param>
+        /// <param name="entity">Сущность с данными</param>
+        [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
+        public void FillSPListItemFromEntity(SPWeb web, SPListItem spListItem, Type entityType, object entity)
+        {
+            //Type entityType = typeof(TEntity);
+            foreach (FieldToPropertyMapping fieldMapping in Mappings)
+            {
+                if (!fieldMapping.ReadOnly)
+                {
+                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(spListItem, entityType, fieldMapping);
+                    SPField field = ItemFieldsChecking.EnsureListFieldID(spListItem, entityType, fieldMapping);
+
+                    object propertyValue = propertyInfo.GetValue(entity, null);
+                    object fieldValue;
+
+                    if (propertyValue == null || string.IsNullOrEmpty(propertyValue.ToString()))
+                        fieldValue = null;
+                    else
+                        fieldValue = GetDefaultConverter(web, propertyInfo, field).ConvertPropertyValueToFieldValue(propertyValue);
+
+                    try
+                    {
+                        spListItem[fieldMapping.FieldName] = fieldValue;
+                    }
+                    catch (Exception ex)
+                    {
+                        string errorMessage = $@"Не удалось записать значение {fieldValue} в поле {fieldMapping.FieldName} 
+                                для сущности {entityType.FullName}.";
+                        var nextException = new Exception(errorMessage, ex);
+                        logger.Error(errorMessage, nextException);
+                        throw nextException;
+                    }
+                }
+            }
+        }
+
+
+
+        public void FillEntityFromSPListItem(SPWeb web, object entity, Type entityType, SPListItem item)
+        {
+            foreach (FieldToPropertyMapping fieldMapping in this.Mappings)
+            {
+                try
+                {
+                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(item, entityType, fieldMapping);
+                    ItemFieldsChecking.EnsureListFieldID(item, entityType, fieldMapping);
+
+                    SPField field = item.Fields.GetField(fieldMapping.FieldName);
+                    object fieldValue = item[fieldMapping.FieldName];
+                    object value;
+
+                    if (fieldValue == null || string.IsNullOrEmpty(fieldValue.ToString()))
+                        value = null;
+                    else
+                    {
+                        var converter = GetDefaultConverter(web, propertyInfo, field);
+                        value = converter.ConvertFieldValueToPropertyValue(fieldValue);
+                    }
+                    propertyInfo.SetValue(entity, value, null);
+                }
+                catch (Exception ex)
+                {
+                    string messageFormat = "Ошибка сопоставления свойства {0} сущности {1} с полем {2} элемента {3} списка {4} узла {5}";
+                    string message = string.Format(messageFormat,
+                        fieldMapping.EntityPropertyName,
+                        entityType.Name,
+                        fieldMapping.FieldName,
+                        item.ID,
+                        item.ParentList.Title,
+                        web.Title);
+
+                    InvalidOperationException newException = new InvalidOperationException(message, ex);
+                    logger.Error(message, newException);
+                    throw newException;
+                }
+            }
+        }
+
         public void FillEntityFromAfterProperties(SPWeb web, object entity, Type entityType, SPItemEventProperties properties)
         {
             SPList list = web.Lists[properties.ListId];
-            foreach (FieldToEntityPropertyMapping fieldMapping in this.fieldMappings)
+            foreach (var fieldMapping in this.Mappings)
             {
 
                 try
                 {
                     PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(entityType, fieldMapping);
-                    //EnsureListFieldID(item, entityType, fieldMapping);
 
                     SPField field = list.Fields.GetField(fieldMapping.FieldName);
                     object fieldValue;
@@ -169,177 +294,8 @@ namespace SP2016.Repository.Mapping
                     throw newException;
                 }
             }
-
         }
 
-        /// <summary>
-        /// Заполнить AfterProperties на основе данных сущности
-        /// </summary>
-        /// <param name="properties"></param>
-        /// <param name="entity">Сущность с данными</param>
-        [SharePointPermissionAttribute(SecurityAction.LinkDemand, ObjectModel = true)]
-        public void FillAfterPropertiesFromEntity(SPWeb web, SPItemEventProperties properties, Type entityType, object entity)
-        {
-            //Type entityType = typeof(TEntity);
-            foreach (FieldToEntityPropertyMapping fieldMapping in this.fieldMappings)
-            {
-                if (!fieldMapping.ReadOnly)
-                {
-                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(entityType, fieldMapping);
-                    SPField field = ItemFieldsChecking.EnsureListFieldID(properties.List, entityType, fieldMapping);
-
-                    object propertyValue = propertyInfo.GetValue(entity, null);
-                    object fieldValue;
-
-                    if (propertyValue == null || string.IsNullOrEmpty(propertyValue.ToString()))
-                        fieldValue = null;
-                    else
-                        fieldValue = GetAfterPropertiesFieldValuesConverter(web, propertyInfo, field).ConvertPropertyValueToFieldValue(propertyValue);
-
-                    try
-                    {
-                        properties.AfterProperties[fieldMapping.FieldName] = fieldValue;
-                    }
-                    catch (ArgumentException argumentException)
-                    {
-                        string errorMessage = string.Format(
-                            CultureInfo.CurrentCulture,
-                            "Не удалось записать значение {0} в поле {1} для сущности {2}.",
-                            fieldValue,
-                            fieldMapping.FieldName,
-                            entityType.FullName);
-
-                        var newException = new ListItemFieldMappingException(errorMessage, argumentException);
-                        logger.Error(errorMessage, newException);
-                        throw newException;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Заполнить SPListItem на основе данных сущности
-        /// </summary>
-        /// <param name="spListItem">Элемент списка</param>
-        /// <param name="entity">Сущность с данными</param>
-        [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
-        public void FillSPListItemFromEntity(SPWeb web, SPListItem spListItem, Type entityType, object entity)
-        {
-            //Type entityType = typeof(TEntity);
-            foreach (FieldToEntityPropertyMapping fieldMapping in this.fieldMappings)
-            {
-                if (!fieldMapping.ReadOnly)
-                {
-                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(spListItem, entityType, fieldMapping);
-                    SPField field = ItemFieldsChecking.EnsureListFieldID(spListItem, entityType, fieldMapping);
-
-                    object propertyValue = propertyInfo.GetValue(entity, null);
-                    object fieldValue;
-
-                    if (propertyValue == null || string.IsNullOrEmpty(propertyValue.ToString()))
-                        fieldValue = null;
-                    else
-                        fieldValue = GetDefaultConverter(web, propertyInfo, field).ConvertPropertyValueToFieldValue(propertyValue);
-
-                    try
-                    {
-                        spListItem[fieldMapping.FieldName] = fieldValue;
-                    }
-                    catch (ArgumentException argumentException)
-                    {
-                        string errorMessage = string.Format(
-                            CultureInfo.CurrentCulture,
-                            "Не удалось записать значение {0} в поле {1} для сущности {2}.",
-                            fieldValue,
-                            fieldMapping.FieldName,
-                            entityType.FullName);
-
-                        var newException = new ListItemFieldMappingException(errorMessage, argumentException);
-                        logger.Error(errorMessage, newException);
-                        throw newException;
-                    }
-                }
-            }
-        }
-
-        public void FillEntityFromSPListItem(SPWeb web, object entity, Type entityType, SPListItem item)
-        {
-            foreach (FieldToEntityPropertyMapping fieldMapping in this.fieldMappings)
-            {
-                try
-                {
-                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(item, entityType, fieldMapping);
-                    ItemFieldsChecking.EnsureListFieldID(item, entityType, fieldMapping);
-
-                    SPField field = item.Fields.GetField(fieldMapping.FieldName);
-                    object fieldValue = item[fieldMapping.FieldName];
-                    object value;
-
-                    if (fieldValue == null || string.IsNullOrEmpty(fieldValue.ToString()))
-                        value = null;
-                    else
-                    {
-                        var converter = GetDefaultConverter(web, propertyInfo, field);
-                        value = converter.ConvertFieldValueToPropertyValue(fieldValue);
-                    }
-                    propertyInfo.SetValue(entity, value, null);
-                }
-                catch (Exception ex)
-                {
-                    string messageFormat = "Ошибка сопоставления свойства {0} сущности {1} с полем {2} элемента {3} списка {4} узла {5}";
-                    string message = string.Format(messageFormat,
-                        fieldMapping.EntityPropertyName,
-                        entityType.Name,
-                        fieldMapping.FieldName,
-                        item.ID,
-                        item.ParentList.Title,
-                        web.Title);
-
-                    InvalidOperationException newException = new InvalidOperationException(message, ex);
-                    logger.Error(message, newException);
-                    throw newException;
-                }
-            }
-        }
-
-        public void FillEntityFromSPListItem(SPWeb web, object entity, Type entityType, SPListItemVersion item)
-        {
-            foreach (FieldToEntityPropertyMapping fieldMapping in this.fieldMappings)
-            {
-                try
-                {
-                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(item, entityType, fieldMapping);
-                    ItemFieldsChecking.EnsureListFieldID(item, entityType, fieldMapping);
-
-                    SPField field = item.Fields.GetField(fieldMapping.FieldName);
-                    object fieldValue = item[fieldMapping.FieldName];
-                    object value;
-
-                    if (fieldValue == null || string.IsNullOrEmpty(fieldValue.ToString()))
-                        value = null;
-                    else
-                        value = GetItemVersionFieldValuesConverter(web, propertyInfo, field).ConvertFieldValueToPropertyValue(fieldValue);
-
-                    propertyInfo.SetValue(entity, value, null);
-                }
-                catch (Exception ex)
-                {
-                    string messageFormat = "Ошибка сопоставления свойства {0} сущности {1} с полем {2} версии {3} элемента {4} списка {5} узла {6}";
-                    string message = string.Format(messageFormat,
-                        fieldMapping.EntityPropertyName,
-                        entityType.Name,
-                        fieldMapping.FieldName,
-                        item.VersionId,
-                        item.ListItem.ID,
-                        item.ListItem.ParentList.Title,
-                        web.Title);
-
-                    InvalidOperationException newException = new InvalidOperationException(message, ex);
-                    logger.Error(message, newException);
-                    throw newException;
-                }
-            }
-        }
 
         #endregion
 
@@ -386,7 +342,7 @@ namespace SP2016.Repository.Mapping
             { typeof(SPContentTypeId), new SPContentTypeIdValueConverter() },
             { typeof(SPContentType), new SPContentTypeValueConverter() },
             { typeof(SPFieldUserValueCollection), new SPFieldUserValueCollectionConverter() },
-            { typeof(String), new AfterPropertiesStringValueConverter() },
+            { typeof(string), new AfterPropertiesStringValueConverter() },
         };
 
         private readonly Dictionary<Type, BaseConverter> BatchConvertersMapping = new Dictionary<Type, BaseConverter>
@@ -395,7 +351,7 @@ namespace SP2016.Repository.Mapping
             { typeof(SPContentTypeId), new SPContentTypeIdValueConverter() },
             { typeof(SPContentType), new SPContentTypeValueConverter() },
             { typeof(SPFieldUserValueCollection), new SPFieldUserValueCollectionConverter() },
-            { typeof(String), new BatchStringValueConverter() },
+            { typeof(string), new BatchStringValueConverter() },
         };
     }
 }

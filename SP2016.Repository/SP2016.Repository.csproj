@@ -53,12 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\BaseSharePointConverter.cs" />
-    <Compile Include="Batch\Batch.cs" />
-    <Compile Include="Batch\Method.cs" />
     <Compile Include="Batch\ResultEntry.cs" />
     <Compile Include="Batch\Results.cs" />
     <Compile Include="Batch\SetFieldValue.cs" />
-    <Compile Include="Batch\SetList.cs" />
     <Compile Include="Converters\AfterPropertiesStringValueConverter.cs" />
     <Compile Include="Converters\BatchStringValueConverter.cs" />
     <Compile Include="Converters\CalendarReccurenceDataConverter.cs" />
@@ -124,11 +121,9 @@
     <Compile Include="Attributes\FieldMappingAttribute.cs" />
     <Compile Include="IBaseEntityRepository.cs" />
     <Compile Include="IBaseRepository.cs" />
-    <Compile Include="Mapping\ListItemFieldMappingException.cs" />
     <Compile Include="Mapping\FieldToPropertyMapper.cs" />
-    <Compile Include="Mapping\FieldToEntityPropertyMapping.cs" />
+    <Compile Include="Mapping\FieldToPropertyMapping.cs" />
     <Compile Include="Entities\IEntity.cs" />
-    <Compile Include="Mapping\IListItemFieldMapper.cs" />
     <Compile Include="Utils\ReflectionUtil.cs" />
     <Compile Include="Logging\ILog.cs" />
     <Compile Include="Logging\Logger.cs" />

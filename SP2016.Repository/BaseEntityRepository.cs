@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using Microsoft.SharePoint;
-using System.Globalization;
 using SP2016.Repository.Caml;
 using SP2016.Repository.Utils;
 using SP2016.Repository.Enums;
@@ -24,19 +23,19 @@ namespace SP2016.Repository
     /// <typeparam name="TEntity">Конкретная сущность, для которой создается репозиторий</typeparam>
     public abstract class BaseEntityRepository<TEntity> : ISharePointRepository<TEntity> where TEntity : BaseEntity, new()
     {
-        protected virtual FieldToEntityPropertyMapping[] FieldMappings => new FieldToEntityPropertyMapping[0];
+        protected virtual FieldToPropertyMapping[] FieldMappings => new FieldToPropertyMapping[0];
         public abstract string ListName { get; }
 
         private readonly SPFieldToPropertyMapper ListItemFieldMapper;
-        private readonly FieldToEntityPropertyMapping[] DefaultFieldMappings = new FieldToEntityPropertyMapping[]
+        private readonly FieldToPropertyMapping[] DefaultFieldMappings = new FieldToPropertyMapping[]
         {
-            new FieldToEntityPropertyMapping("ID", true),
-            new FieldToEntityPropertyMapping("GUID", true),
-            new FieldToEntityPropertyMapping("Author", true),
-            new FieldToEntityPropertyMapping("Editor", true),
-            new FieldToEntityPropertyMapping("Modified", true),
-            new FieldToEntityPropertyMapping("Created", true),
-            new FieldToEntityPropertyMapping("FileLeafRef", true)
+            new FieldToPropertyMapping("ID", true),
+            new FieldToPropertyMapping("GUID", true),
+            new FieldToPropertyMapping("Author", true),
+            new FieldToPropertyMapping("Editor", true),
+            new FieldToPropertyMapping("Modified", true),
+            new FieldToPropertyMapping("Created", true),
+            new FieldToPropertyMapping("FileLeafRef", true)
         };
         
         public BaseEntityRepository()
@@ -133,40 +132,6 @@ namespace SP2016.Repository
             #endregion
 
         /// <summary>
-        /// Получение элемента списка
-        /// </summary>
-        /// <param name="caml">Caml запрос для получения сущности</param>
-        /// <param name="web">Узел, с которого необходимо получить сущность</param>
-        /// <returns>Сущность с заполненными свойствами</returns>
-        /// <remarks>Если caml запрос вернет несколько сущностей, будет взята первая из них</remarks>
-        public TEntity GetEntity(SPWeb web, string caml)
-        {
-            TEntity entity = default(TEntity);
-
-            var query = new SPQuery
-            {
-                Query = caml
-            };
-
-            SPListItem item = null;
-            SPListItemCollection collection = null;
-
-            collection = web.Lists[ListName].GetItems(query);
-
-            if (collection != null && collection.Count > 0)
-            {
-                item = collection[0];
-            }
-
-            if (item != null)
-            {
-                entity = CreateEntity(web, item);
-            }
-
-            return entity;
-        }
-
-        /// <summary>
         /// Получить сущности из папки
         /// </summary>
         /// <param name="web">Веб-сайт</param>
@@ -220,24 +185,6 @@ namespace SP2016.Repository
             {
                 Where = expr,
                 Recursive = recursive
-            };
-
-            return GetEntities(web, query, rowLimit);
-        }
-
-        /// <summary>
-        /// Получение коллекции сущностей
-        /// </summary>
-        /// <param name="expr">Выражение для фильтрации</param>
-        /// <param name="web">Узел, с которого необходимо получить коллекцию</param>
-        /// <param name="recursive">Получить элементы рекурсивно из папок</param>
-        /// <returns>Все сущности, удовлетворяющие запросу</returns>
-        public TEntity[] GetEntities(SPWeb web, object expr, uint rowLimit = 0)
-        {
-            var query = new Query
-            {
-                Where = (IExpression)expr,
-                Recursive = true
             };
 
             return GetEntities(web, query, rowLimit);
@@ -306,12 +253,12 @@ namespace SP2016.Repository
         /// </summary>
         /// <param name="item">Элемент списка</param>
         /// <returns>Сущность с заполненными свойствами</returns>
-        public virtual TEntity CreateEntity(SPWeb web, SPListItemVersion spListItem)
+        public virtual TEntity CreateEntity(SPWeb web, SPListItemVersion spListItemVersion)
         {
             TEntity entity = new TEntity();
             Type entityType = typeof(TEntity);
 
-            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, entityType, spListItem);
+            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, entityType, spListItemVersion.ListItem);
             entity.ListItem = spListItem.ListItem;
             return entity;
         }
@@ -960,7 +907,7 @@ namespace SP2016.Repository
 
         protected void UpdateListItemInternal(SPWeb web, TEntity entity, SPListItem listItem, bool trackChanges = true)
         {
-            this.ListItemFieldMapper.FillSPListItemFromEntity(web, listItem, typeof(TEntity), entity);
+            ListItemFieldMapper.FillSPListItemFromEntity(web, listItem, typeof(TEntity), entity);
             using (new AllowUnsafeUpdates(web))
             {
                 if (trackChanges)
@@ -1500,7 +1447,6 @@ namespace SP2016.Repository
 
         #endregion
 
-
         #region Other Methods
 
         /// <summary>
@@ -1544,6 +1490,12 @@ namespace SP2016.Repository
             }
         }
 
+        /// <summary>
+        /// Create folder
+        /// </summary>
+        /// <param name="web">SharePoint Web</param>
+        /// <param name="folderRelativeUrl">folder url </param>
+        /// <returns></returns>
         private SPFolder CreateFolder(SPWeb web, string folderRelativeUrl)
         {
             SPList list = GetList(web);
@@ -1567,31 +1519,6 @@ namespace SP2016.Repository
         {
             SPListItem item = GetListItemById(web, id);
             return item != null;
-        }
-
-        /// <summary>
-        /// Проверка существования необходимых полей
-        /// </summary>
-        /// <param name="item">Элемент, существование полей в котором необходимо проверить</param>
-        public void CheckExistsFields(SPListItem item)
-        {
-            List<string> missingFields = new List<string>();
-
-            foreach (var mapping in ListItemFieldMapper.Mappings)
-            {
-                if (!item.Fields.ContainsField(mapping.FieldName))
-                    missingFields.Add(mapping.FieldName);
-            }
-
-            if (missingFields.Count > 0)
-            {
-                ArgumentException ex = new ArgumentException(
-                    string.Format(
-                    CultureInfo.CurrentCulture,
-                    "Следующие поля отсутствуют: {0}",
-                    string.Join(", ", missingFields.ToArray())));
-                throw ex;
-            }
         }
 
         public bool FolderExists(SPWeb web, string url)

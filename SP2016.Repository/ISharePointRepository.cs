@@ -1,4 +1,5 @@
 ﻿using Microsoft.SharePoint;
+using SP2016.Repository.Caml;
 using SP2016.Repository.Entities;
 
 namespace SP2016.Repository
@@ -49,7 +50,7 @@ namespace SP2016.Repository
         /// <param name="context">Узел, с которого необходимо получить коллекцию</param>
         /// <param name="recursive">Получить элементы рекурсивно из папок</param>
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
-        T[] GetEntities(SPWeb web, Caml.IExpression expr, bool recursive, uint rowLimit);
+        T[] GetEntities(SPWeb web, IExpression expr, bool recursive, uint rowLimit);
 
         string GetDisplayFormUrl(SPWeb web, T entity);
     }

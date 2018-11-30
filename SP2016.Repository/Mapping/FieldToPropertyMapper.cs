@@ -3,62 +3,32 @@ using SP2016.Repository.Converters.Default;
 using SP2016.Repository.Utils;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 
 namespace SP2016.Repository.Mapping
 {
-    public abstract class FieldToPropertyMapper : IListItemFieldMapper
+    public abstract class FieldToPropertyMapper
     {
-        /// <summary>
-        /// Коллекция сопоставления полей элементов списка и свойств сущности
-        /// </summary>
-        protected readonly List<FieldToEntityPropertyMapping> fieldMappings = new List<FieldToEntityPropertyMapping>();
+        protected List<FieldToPropertyMapping> Mappings { get; }
 
-        protected readonly Dictionary<string, BaseConverter> defaultConvertersByNameMapping = new Dictionary<string, BaseConverter>();
-
-        public IReadOnlyCollection<FieldToEntityPropertyMapping> Mappings => fieldMappings;
-
-        public void AddMapping(FieldToEntityPropertyMapping fieldToPropertyMapRecord)
+        public FieldToPropertyMapper()
         {
-            fieldMappings.Add(fieldToPropertyMapRecord);
+            Mappings = new List<FieldToPropertyMapping>();
         }
 
-        public void AddMapping(FieldToEntityPropertyMapping[] fieldToPropertyMapRecords)
+        protected readonly Dictionary<Type, BaseConverter> defaultConvertersByTypeMapping = new Dictionary<Type, BaseConverter>
         {
-            fieldMappings.AddRange(fieldToPropertyMapRecords);
-        }
+            [typeof(string)] = new StringValueConverter(),
+            [typeof(int)] = new Int32Converter(),
+            [typeof(float)] = new SingleConverter(),
+            [typeof(double)] = new DoubleConverter(),
+            [typeof(DateTime)] = new DateTimeConverter(),
+            [typeof(bool)] = new BooleanConverter(),
+            [typeof(Enum)] = new EnumConverter(),
+            [typeof(Guid)] = new GuidConverter(),
+        };
 
-        public void RegisterConverterForPropertyName(string propertyName, BaseConverter converter, Dictionary<string, BaseConverter> customConvertersMapping = null)
-        {
-            (customConvertersMapping ?? defaultConvertersByNameMapping).Add(propertyName, converter);
-        }
-
-        public void RegisterConverterForPropertyType(Type propertyType, BaseConverter converter, Dictionary<Type, BaseConverter> customConvertersMapping = null)
-        {
-            (customConvertersMapping ?? defaultConvertersByTypeMapping).Add(propertyType, converter);
-        }
-
-        public virtual BaseConverter GetConverterForProperty(string propertyName, Type entityType, Dictionary<Type, BaseConverter> customConvertersMapping = null)
-        {
-            var propertyInfo = ReflectionUtil.GetPropertyInfo(entityType, propertyName);
-            return GetConverterForProperty(propertyInfo, customConvertersMapping);
-        }
-
-        public virtual BaseConverter GetConverterForProperty(PropertyInfo propertyInfo, Dictionary<Type, BaseConverter> customConvertersMapping = null)
-        {
-            if (defaultConvertersByNameMapping.ContainsKey(propertyInfo.Name))
-                return defaultConvertersByNameMapping[propertyInfo.Name];
-
-            BaseConverter converter = TryGetConverterFromAttribute(propertyInfo) ?? 
-                GetConverterByPropertyType(propertyInfo, customConvertersMapping);
-
-            if (converter != null)
-                converter.PropertyInfo = propertyInfo;
-
-            return converter;
-        }
-
+        // TODO :: move code related to reflection to reflection util
         protected BaseConverter TryGetConverterFromAttribute(PropertyInfo propertyInfo)
         {
             object[] specialConverterAttributes = propertyInfo.GetCustomAttributes(typeof(FieldMappingAttribute), true);
@@ -67,7 +37,13 @@ namespace SP2016.Repository.Mapping
                 return null;
 
             if (specialConverterAttributes.Length > 1)
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentUICulture, "Более одного конвертера для одного свойства {0} класса {1}", propertyInfo.Name, propertyInfo.DeclaringType.Name));
+            {
+                string errorMessage = $@"Более одного конвертера для одного свойства {propertyInfo.Name} 
+                        класса {propertyInfo.DeclaringType.Name}";
+
+                throw new InvalidOperationException(errorMessage);
+            }
+                
 
             FieldMappingAttribute fieldValuesConverterAttribute = (FieldMappingAttribute)specialConverterAttributes[0];
             if (string.IsNullOrWhiteSpace(fieldValuesConverterAttribute.FieldValuesConverterTypeName))
@@ -78,7 +54,12 @@ namespace SP2016.Repository.Mapping
             var converter = Activator.CreateInstance(converterType, bindingAttr, null, null, null) as BaseConverter;
 
             if (converter == null)
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentUICulture, "Конвертер для свойства {0} класса {1} не указан или не реализует необходимый интерфейс", propertyInfo.Name, propertyInfo.DeclaringType.Name));
+            {
+                string errorMessage = $@"Конвертер для свойства {propertyInfo.Name} класса 
+                            {propertyInfo.DeclaringType.Name} не указан или не реализует необходимый интерфейс";
+                   
+                throw new InvalidOperationException(errorMessage);
+            }
 
             return converter;
         }
@@ -107,17 +88,26 @@ namespace SP2016.Repository.Mapping
             return converter;
         }
 
-        //конвертеры по умолчанию
-        protected readonly Dictionary<Type, BaseConverter> defaultConvertersByTypeMapping = new Dictionary<Type, BaseConverter>
+        public void RegisterConverterForPropertyType(Type propertyType, BaseConverter converter, Dictionary<Type, BaseConverter> customConvertersMapping = null)
         {
-            [typeof(string)] = new StringValueConverter(),
-            [typeof(int)] = new Int32Converter(),
-            [typeof(float)] = new SingleConverter(),
-            [typeof(double)] = new DoubleConverter(),
-            [typeof(DateTime)] = new DateTimeConverter(),
-            [typeof(bool)] = new BooleanConverter(),
-            [typeof(Enum)] = new EnumConverter(),
-            [typeof(Guid)] = new GuidConverter(),
-        };
+            (customConvertersMapping ?? defaultConvertersByTypeMapping).Add(propertyType, converter);
+        }
+
+        public virtual BaseConverter GetConverterForProperty(string propertyName, Type entityType, Dictionary<Type, BaseConverter> customConvertersMapping = null)
+        {
+            var propertyInfo = ReflectionUtil.GetPropertyInfo(entityType, propertyName);
+            return GetConverterForProperty(propertyInfo, customConvertersMapping);
+        }
+
+        public virtual BaseConverter GetConverterForProperty(PropertyInfo propertyInfo, Dictionary<Type, BaseConverter> customConvertersMapping = null)
+        {
+            BaseConverter converter = TryGetConverterFromAttribute(propertyInfo) ?? 
+                GetConverterByPropertyType(propertyInfo, customConvertersMapping);
+
+            if (converter != null)
+                converter.PropertyInfo = propertyInfo;
+
+            return converter;
+        }
     }
 }

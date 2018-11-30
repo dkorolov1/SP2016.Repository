@@ -1,11 +1,10 @@
 ﻿using Microsoft.SharePoint;
-using SP2016.Repository.Mapping;
 using SP2016.Repository.Converters.Default;
 using System.Reflection;
 
 namespace SP2016.Repository.Mapping
 {
-    public interface ISPFieldToPropertyMapper : IListItemFieldMapper
+    public interface ISPFieldToPropertyMapper
     {
         BaseConverter GetDefaultConverter(SPWeb web, PropertyInfo propertyInfo, SPField field);
 
