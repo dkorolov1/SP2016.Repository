@@ -4,7 +4,7 @@ using SP2016.Repository.Mapping;
 
 namespace SP2016.Repository.Tests
 {
-    public class UsersRepository : BaseEntityRepository<UserEntity>
+    public class UsersRepository : BaseSharePointRepository<UserEntity>
     {
         public override string ListName => "Users";
 

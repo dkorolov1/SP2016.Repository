@@ -4,51 +4,51 @@ using SP2016.Repository.Entities;
 
 namespace SP2016.Repository
 {
-    public interface ISharePointRepository<T> : IBaseEntityRepository<SPWeb, T> where T : IEntity, new()
+    public interface ISharePointRepository<T> : IRepository<SPWeb, T> where T : IEntity, new()
     {
         T CreateEntity(SPWeb web, SPItemEventProperties afterProperties);
         T CreateEntity(SPWeb web, SPListItem listItem);
         T CreateEntity(SPWeb web, SPListItemVersion listItemVersion);
 
         /// <summary>
-        /// Добавить сущность, управляя срабатыванием приемников событий
+        /// Adding entity with event firing configuration
         /// </summary>
-        /// <param name="entity">Сущность для добавления</param>
-        /// <param name="context">Узел, на который необходимо добавить сущность</param>
-        /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
+        /// <param name="web">Web which contains the list</param>
+        /// <param name="entity">Entity to be added</param>
+        /// <param name="eventFiringEnabled">Should addition events be fired</param>
         void Add(SPWeb web, T entity, bool eventFiringEnabled);
 
         /// <summary>
-        /// Добавить сущность в папку
+        /// Adding entity to a folder
         /// </summary>
-        /// <param name="folderListRelativeUrl">Адрес папки, относительно корневой</param>
-        /// <param name="entity">Сущность для добавления</param>
-        /// <param name="context">Узел, на который необходимо добавить сущность</param>
+        /// <param name="web">Web which contains the list</param>
+        /// <param name="folderListRelativeUrl">List-relative folder URL</param>
+        /// <param name="entity">Entity to be added</param>
         void Add(SPWeb web, string folderListRelativeUrl, T entity);
 
         /// <summary>
-        /// Добавить сущность в папку, управляя срабатыванием приемников событий
+        /// Adding entity to a folder with event firing configuration
         /// </summary>
-        /// <param name="folderListRelativeUrl">Адрес папки, относительно корневой</param>
-        /// <param name="entity">Сущность для добавления</param>
-        /// <param name="context">Узел, на который необходимо добавить сущность</param>
-        /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
+        /// <param name="web">Web which contains the list</param>
+        /// <param name="folderListRelativeUrl">List-relative folder URL</param>
+        /// <param name="entity">Entity to be added</param>
+        /// <param name="eventFiringEnabled">Should addition events be fired</param>
         void Add(SPWeb web, string folderListRelativeUrl, T entity, bool eventFiringEnabled);
 
         /// <summary>
-        /// Обновить сущность
+        /// Updating an entity
         /// </summary>
-        /// <param name="entity">Сущность для обновления</param>
-        /// <param name="context">Узел, на который необходимо добавить сущность</param>
-        /// <param name="trackChanges">Позволить ли SharePoint отслеживать изменения</param>
+        /// <param name="web">Web which contains the list</param>
+        /// <param name="entity">Entity to be updated</param>
+        /// <param name="trackChanges">Allow SharePoint to track changes</param>
         void Update(SPWeb web, T entity, bool trackChanges);
 
         /// <summary>
-        /// Получение коллекции сущностей
+        /// Getting collection of enities with query
         /// </summary>
-        /// <param name="expr">Выражение для фильтрации</param>
-        /// <param name="context">Узел, с которого необходимо получить коллекцию</param>
-        /// <param name="recursive">Получить элементы рекурсивно из папок</param>
+        /// <param name="web">Web which contains the list</param>
+        /// <param name="expr">Expression for filtering</param>
+        /// <param name="recursive">Get entities from all folders</param>
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         T[] GetEntities(SPWeb web, IExpression expr, bool recursive, uint rowLimit);
 

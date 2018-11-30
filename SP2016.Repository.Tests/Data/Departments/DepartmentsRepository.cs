@@ -2,7 +2,7 @@
 
 namespace SP2016.Repository.Tests
 {
-    public class DepartmentsRepository : BaseEntityRepository<UserEntity>
+    public class DepartmentsRepository : BaseSharePointRepository<UserEntity>
     {
         public override string ListName => "Departments";
 
