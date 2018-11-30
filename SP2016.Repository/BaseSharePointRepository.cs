@@ -260,7 +260,7 @@ namespace SP2016.Repository
             Type entityType = typeof(TEntity);
 
             ListItemFieldMapper.FillEntityFromSPListItem(web, entity, entityType, spListItemVersion.ListItem);
-            entity.ListItem = spListItem.ListItem;
+            entity.ListItem = spListItemVersion.ListItem;
             return entity;
         }
 
@@ -1525,6 +1525,11 @@ namespace SP2016.Repository
             }
             catch (ArgumentException) { return false; }
             catch (Exception) { return false; }
+        }
+
+        public TEntity[] GetEntities(SPWeb context, object expr, uint rowLimit)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
