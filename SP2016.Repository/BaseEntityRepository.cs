@@ -62,7 +62,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить все сущности
         /// </summary>
-        /// <param name="web">Узел</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Массив сущностей</returns>
         public TEntity[] GetAllEntities(SPWeb web, bool recursive = true)
         {
@@ -79,7 +79,7 @@ namespace SP2016.Repository
         /// Получение коллекции сущностей
         /// </summary>
         /// <param name="caml">Caml запрос</param>
-        /// <param name="web">Узел, с которого необходимо получить коллекцию</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="recursive">Получить элементы рекурсивно из всех папок</param>
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         private TEntity[] GetEntities(SPWeb web, string caml, bool recursive, uint rowLimit = 0)
@@ -96,12 +96,12 @@ namespace SP2016.Repository
             return GetEntities(web, query);
         }
 
-            #region Специфичные фильтры
+        #region Специфичные фильтры
 
         /// <summary>
         /// Получить сущности по названию
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="title">Название сущности (Поле Title, Название)</param>
         /// <returns>Сущности с названием title</returns>
         public virtual TEntity[] GetEntitiesByTitle(SPWeb web, string title, bool recursive = true, uint rowLimit = 0)
@@ -117,7 +117,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить сущность по названию
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="title">Название сущности (Поле Title, Название)</param>
         /// <returns>Сущности с названием title</returns>
         public virtual TEntity GetEntityByTitle(SPWeb web, string title)
@@ -130,13 +130,13 @@ namespace SP2016.Repository
             return GetEntities(web, camlQuery, true, 1).FirstOrDefault();
         }
 
-            #endregion
+        #endregion
 
         /// <summary>
         /// Получение элемента списка
         /// </summary>
         /// <param name="caml">Caml запрос для получения сущности</param>
-        /// <param name="web">Узел, с которого необходимо получить сущность</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Сущность с заполненными свойствами</returns>
         /// <remarks>Если caml запрос вернет несколько сущностей, будет взята первая из них</remarks>
         public TEntity GetEntity(SPWeb web, string caml)
@@ -169,7 +169,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить сущности из папки
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="folderPath">Путь к папкам, создающим иерархию. Например folder1/folder2/folder3</param>
         /// <returns>Сущности</returns>
         public TEntity[] GetEntities(SPWeb web, string folderPath)
@@ -192,7 +192,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить сущности по запросу
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="query">Запрос</param>
         /// <returns>Сущности</returns>
         public TEntity[] GetEntities(SPWeb web, Query query, uint rowLimit = 0)
@@ -211,7 +211,7 @@ namespace SP2016.Repository
         /// Получение коллекции сущностей
         /// </summary>
         /// <param name="expr">Выражение для фильтрации</param>
-        /// <param name="web">Узел, с которого необходимо получить коллекцию</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="recursive">Получить элементы рекурсивно из папок</param>
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         public TEntity[] GetEntities(SPWeb web, IExpression expr, bool recursive, uint rowLimit = 0)
@@ -229,7 +229,7 @@ namespace SP2016.Repository
         /// Получение коллекции сущностей
         /// </summary>
         /// <param name="expr">Выражение для фильтрации</param>
-        /// <param name="web">Узел, с которого необходимо получить коллекцию</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="recursive">Получить элементы рекурсивно из папок</param>
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         public TEntity[] GetEntities(SPWeb web, object expr, uint rowLimit = 0)
@@ -246,8 +246,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Получение коллекции сущностей
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="query">Объект SPQuery, содержащий запрос</param>
-        /// <param name="web">Узел, с которого необходимо получить коллекцию</param>
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         public TEntity[] GetEntities(SPWeb web, SPQuery query)
         {
@@ -266,6 +266,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Заполнить сущность значениями элемента списка
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="item">Элемент списка</param>
         /// <returns>Сущность с заполненными свойствами</returns>
         public virtual TEntity CreateEntity(SPWeb web, SPListItem spListItem)
@@ -288,7 +289,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Primary used in SomethingUpdating event receivers.
         /// </summary>
-        /// <param name="web"></param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="properties">Event receiver properties object</param>
         /// <returns>Entity with new data</returns>
         public virtual TEntity CreateEntityFromAfterProperties(SPWeb web, SPItemEventProperties properties)
@@ -304,6 +305,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Заполнить сущность значениями элемента списка
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="item">Элемент списка</param>
         /// <returns>Сущность с заполненными свойствами</returns>
         public virtual TEntity CreateEntity(SPWeb web, SPListItemVersion spListItem)
@@ -320,6 +322,12 @@ namespace SP2016.Repository
 
         #region Getting last created entities
 
+        /// <summary>
+        /// Used for returning last N added items to the list.
+        /// </summary>
+        /// <param name="web">Web which contains the list</param>
+        /// <param name="numberOfEntities">Number of required entities</param>
+        /// <returns></returns>
         public TEntity[] GetLastEntities(SPWeb web, uint numberOfEntities)
         {
             var query = new Query();
@@ -330,13 +338,13 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Получение сущностей по идентификаторам
+        #region Getting entities by IDs
 
         protected SPListItem GetListItemById(SPWeb web, int id)
         {
             try
             {
-                return web.Lists[this.ListName].GetItemById(id);
+                return web.Lists[ListName].GetItemById(id);
             }
             catch (Exception)
             {
@@ -347,14 +355,14 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить сущность по уникальному идентификатору
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="uniqueId">Уникальный идентификатор элемента списка</param>
         /// <returns>Возвращает сущность или null</returns>
         public TEntity GetEntityByUniqueId(SPWeb web, Guid uniqueId)
         {
-            SPListItem item = web.Lists[ListName].GetItemByUniqueId(uniqueId);
+            var item = web.Lists[ListName].GetItemByUniqueId(uniqueId);
             if (null != item)
-                return this.CreateEntity(web, item);
+                return CreateEntity(web, item);
             else
                 return null;
         }
@@ -362,16 +370,21 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить сущность по идентификатору
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="guid">Идентификатор элемента списка</param>
         /// <returns>Возвращает сущность или null</returns>
         public TEntity GetEntityByGUID(SPWeb web, Guid guid)
         {
-            Filter eqGUIDFilter = new Filter(FilterType.Equal, "GUID", guid, FilterValueType.GUID);
-            Query query = new Query() { Where = eqGUIDFilter, Recursive = true };
+            var eqGUIDFilter = new Filter(FilterType.Equal, "GUID", guid, FilterValueType.GUID);
+            var query = new Query
+            {
+                Where = eqGUIDFilter,
+                Recursive = true
+            };
 
-            SimpleCamlBuilder camlBuilder = new SimpleCamlBuilder();
-            string camlQuery = camlBuilder.BuildCaml(query);
+            var camlBuilder = new SimpleCamlBuilder();
+            var camlQuery = camlBuilder.BuildCaml(query);
+
             return GetEntities(web, camlQuery, true, 1).FirstOrDefault();
         }
 
@@ -383,9 +396,9 @@ namespace SP2016.Repository
         /// <returns>Возвращает сущность или null</returns>
         public TEntity GetEntityById(SPWeb web, int id)
         {
-            SPListItem item = GetListItemById(web, id);
+            var item = GetListItemById(web, id);
             if (null != item)
-                return this.CreateEntity(web, item);
+                return CreateEntity(web, item);
             else
                 return null;
         }
@@ -393,7 +406,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить сущность по ИД
         /// </summary>
-        /// <param name="web">Узел, с которого необходимо получить сущность</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="lookupValue">Подстановочное значение для сущности</param>
         /// <returns>Сущность</returns>
         public TEntity GetEntityById(SPWeb web, SPFieldLookupValue lookupValue)
@@ -405,7 +418,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить сущности по их идентификаторам
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="ids">Идентификаторы сущностей</param>
         /// <returns>Сущности</returns>
         public TEntity[] GetEntitiesByIds(SPWeb web, int[] ids)
@@ -433,7 +446,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить сущности по их идентификаторам
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="lookups">Коллекция подстановочных идентификаторов сущностей</param>
         /// <returns>Сущности</returns>
         public TEntity[] GetEntitiesByIds(SPWeb web, SPFieldLookupValueCollection lookups)
@@ -447,7 +460,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить сущности по их идентификаторам
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="lookups">Коллекция подстановочных идентификаторов сущностей</param>
         /// <returns>Сущности</returns>
         public TEntity[] GetEntitiesByIds(SPWeb web, SPFieldLookupValue[] lookups)
@@ -459,14 +472,14 @@ namespace SP2016.Repository
         }
 
         #endregion
-        
+
         #region Добавление элементов
 
         /// <summary>
         /// Добавление нового элемента
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность с данными для добавления</param>
-        /// <param name="web">Узел, на который необходимо добавить информацию</param>
         /// <returns>Идентификатор созданного элемента</returns>
         private void AddListItem(SPWeb web, TEntity entity)
         {
@@ -479,8 +492,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Добавить сущность
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для добавления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         public virtual void Add(SPWeb web, TEntity entity)
         {
             AddListItem(web, entity);
@@ -490,8 +503,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Добавить сущность, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для добавления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void Add(SPWeb web, TEntity entity, bool eventFiringEnabled)
         {
@@ -507,9 +520,9 @@ namespace SP2016.Repository
         /// <summary>
         /// Добавить сущность в папку
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="folderListRelativeUrl">Адрес папки, относительно корневой</param>
         /// <param name="entity">Сущность для добавления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         public virtual void Add(SPWeb web, string folderListRelativeUrl, TEntity entity)
         {
             AddListItemToFolder(web, folderListRelativeUrl, entity);
@@ -519,9 +532,9 @@ namespace SP2016.Repository
         /// <summary>
         /// Добавить сущность в папку, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="folderListRelativeUrl">Адрес папки, относительно корневой</param>
         /// <param name="entity">Сущность для добавления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void Add(SPWeb web, string folderListRelativeUrl, TEntity entity, bool eventFiringEnabled)
         {
@@ -537,8 +550,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Добавить несколько сущностей
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для добавления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         public virtual void AddRange(SPWeb web, IEnumerable<TEntity> entities)
         {
             foreach (var entity in entities)
@@ -568,8 +581,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Добавить несколько сущностей
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entitiesWithFolderPath">Сущность для добавления с указанием папки</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         public virtual void AddRange(SPWeb web, EntityContainer<TEntity>[] entitiesWithFolderPath)
         {
             foreach (var withFolderPath in entitiesWithFolderPath)
@@ -582,8 +595,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Добавить несколько сущностей, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для добавления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void AddRange(SPWeb web, IEnumerable<TEntity> entities, bool eventFiringEnabled)
         {
@@ -599,8 +612,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Добавить несколько сущностей, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для добавления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void AddRange(SPWeb web, EntityContainer<TEntity>[] entitiesWithFolderPath, bool eventFiringEnabled)
         {
@@ -616,8 +629,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Массовое добавление сущностей
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entities">Сущности</param>
-        /// <param name="web">Веб-узел</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после добавления блока элементов. Принимает количество добавленных элементов</param>
         public void AddBatch(TEntity[] entities, SPWeb web, int blocksize = 1000, Action<int> batchFinishedFunc = null)
@@ -629,8 +642,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Массовое добавление сущностей, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entities">Сущности</param>
-        /// <param name="web">Веб-узел</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после добавления блока элементов. Принимает количество добавленных элементов</param>
@@ -648,8 +661,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Массовое добавление сущностей с учетом структуры папок
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entitiesWithFolderPath">Сущности с указанием папок</param>
-        /// <param name="web">Веб-узел</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после добавления блока элементов. Принимает количество добавленных элементов</param>
         public void AddBatch(EntityContainer<TEntity>[] entitiesWithFolderPath, SPWeb web, int blocksize = 1000, Action<int> batchFinishedFunc = null)
@@ -670,8 +683,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Массовое добавление сущностей с учетом структуры папок, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entitiesWithFolderPath">Сущности с указанием папок</param>
-        /// <param name="web">Веб-узел</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после добавления блока элементов. Принимает количество добавленных элементов</param>
@@ -693,7 +706,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Удалить все сущности
         /// </summary>      
-        /// <param name="web">Узел, в котором необходимо удалить сущности</param>
+        /// <param name="web">Web which contains the list</param>
         public void DeleteAll(SPWeb web)
         {
             TEntity[] entities = GetAllEntities(web);
@@ -703,7 +716,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Удалить все сущности, управляя срабатыванием приемников событий
         /// </summary>      
-        /// <param name="web">Узел, в котором необходимо удалить сущности</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void DeleteAll(SPWeb web, bool eventFiringEnabled)
         {
@@ -719,8 +732,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Массовое удаление сущностей
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entities">Сущности</param>
-        /// <param name="web">Веб-узел</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после удаления блока элементов. Принимает количество удалённых элементов</param>
         public void DeleteBatch(TEntity[] entities, SPWeb web, int blocksize = 1000, Action<int> batchFinishedFunc = null)
@@ -732,8 +745,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Массовое удаление сущностей, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entities">Сущности</param>
-        /// <param name="web">Веб-узел</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после удаления блока элементов. Принимает количество удалённых элементов</param>
@@ -751,8 +764,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Массовое удаление сущностей по их идентификаторам
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entityIDs">Массив сущностей</param>
-        /// <param name="web">Веб-узел</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после удаления блока элементов. Принимает количество удалённых элементов</param>
         public void DeleteBatch(int[] entityIDs, SPWeb web, int blocksize = 1000, Action<int> batchFinishedFunc = null)
@@ -768,7 +781,7 @@ namespace SP2016.Repository
         /// Массовое удаление сущностей по их идентификаторам, управляя срабатыванием приемников событий
         /// </summary>
         /// <param name="entityIDs">Массив сущностей</param>
-        /// <param name="web">Веб-узел</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после удаления блока элементов. Принимает количество удалённых элементов</param>
@@ -787,7 +800,7 @@ namespace SP2016.Repository
         /// Удалить сущность
         /// </summary>
         /// <param name="entity">Удаляемая сущность</param>
-        /// <param name="web">Узел, в котором необходимо удалить сущности</param>
+        /// <param name="web">Web which contains the list</param>
         public void Delete(SPWeb web, TEntity entity)
         {
             Delete(web, entity.ID);
@@ -796,8 +809,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Удалить сущность, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Удаляемая сущность</param>
-        /// <param name="web">Узел, в котором необходимо удалить сущность</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void Delete(SPWeb web, TEntity entity, bool eventFiringEnabled)
         {
@@ -807,8 +820,8 @@ namespace SP2016.Repository
         /// <summary>
         ///  Удалить сущность по идентификатору
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="id">Идентификатор удаляемой сущности</param>
-        /// <param name="web">Узел, в котором необходимо удалить сущности</param>
         public void Delete(SPWeb web, int id)
         {
             var listItemService = new ListItemService();
@@ -818,8 +831,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Удалить сущность по идентификатору, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="id">Идентификатор удаляемой сущности</param>
-        /// <param name="web">Узел, в котором необходимо удалить сущность</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void Delete(SPWeb web, int id, bool eventFiringEnabled)
         {
@@ -835,8 +848,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Удалить набор сущностей
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entities">Коллекция удаляемых сущностей</param>
-        /// <param name="web">Узел, в котором необходимо удалить сущности</param>
         public void DeleteRange(SPWeb web, IEnumerable<TEntity> entities)
         {
             foreach (TEntity entity in entities)
@@ -846,8 +859,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Удалить набор сущностей, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entities">Коллекция удаляемых сущностей</param>
-        /// <param name="web">Узел, в котором необходимо удалить сущности</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void DeleteRange(SPWeb web, IEnumerable<TEntity> entities, bool eventFiringEnabled)
         {
@@ -863,8 +876,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Удалить набор сущностей
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="ids">Коллекция идентификаторов удаляемых сущностей</param>
-        /// <param name="web">Узел, в котором необходимо удалить сущности</param>
         public void DeleteRange(SPWeb web, IEnumerable<int> ids)
         {
             foreach (int id in ids)
@@ -874,8 +887,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Удалить набор сущностей, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="ids">Коллекция идентификаторов удаляемых сущностей</param>
-        /// <param name="web">Узел, в котором необходимо удалить сущности</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void DeleteRange(SPWeb web, IEnumerable<int> ids, bool eventFiringEnabled)
         {
@@ -906,8 +919,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Обновление сущности
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность, нуждающаяся в обновлении</param>
-        /// <param name="web">Узел, на котором необходимо обновить данные</param>
         private void UpdateAfterProperties(SPWeb web, TEntity entity, SPItemEventProperties properties)
         {
             try
@@ -924,8 +937,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Обновить сущность
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для обновления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         /// <param name="listItem">Элемент, который должен быть обновлен</param>
         /// <param name="trackChanges">Позволить ли SharePoint отслеживать изменения</param>
         /// <remarks>Необходимо для использования в EventReceiver'е и других местах,
@@ -953,8 +966,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Массовое обновление сущностей с учетом структуры папок
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entities">Сущности с указанием папок</param>
-        /// <param name="web">Веб-узел</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после обновления блока элементов. Принимает количество обновлённых элементов</param>
         public void UpdateBatch(TEntity[] entities, SPWeb web, int blocksize = 1000)
@@ -966,8 +979,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Массовое обновление сущностей, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entities">Сущности с указанием папок</param>
-        /// <param name="web">Веб-узел</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после обновления блока элементов. Принимает количество обновлённых элементов</param>
@@ -985,8 +998,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Обновить сущность, управляя срабатыванием приемников событий
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для обновления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         /// <param name="trackChanges">Позволить ли SharePoint отслеживать изменения</param>
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         public void Update(SPWeb web, TEntity entity, bool trackChanges, bool eventFiringEnabled)
@@ -1003,8 +1016,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Обновить сущность
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для обновления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         /// <param name="trackChanges">Позволить ли SharePoint отслеживать изменения</param>
         public virtual void Update(SPWeb web, TEntity entity)
         {
@@ -1024,8 +1037,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Обновить сущность
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для обновления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущность</param>
         /// <param name="trackChanges">Позволить ли SharePoint отслеживать изменения</param>
         public virtual void Update(SPWeb web, TEntity entity, bool trackChanges)
         {
@@ -1047,8 +1060,8 @@ namespace SP2016.Repository
         /// <summary>
         /// Обновить несколько сущностей
         /// </summary>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entities">Сущности для обновления</param>
-        /// <param name="web">Узел, на который необходимо добавить сущности</param>
         public void UpdateRange(SPWeb web, IEnumerable<TEntity> entities, bool trackChanges)
         {
             foreach (TEntity entity in entities)
@@ -1062,7 +1075,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить веб-адрес представления по умолчанию списка
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Веб-адрес представления по умолчанию списка</returns>
         public string GetDefaultViewUrl(SPWeb web)
         {
@@ -1073,7 +1086,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить абсолютный веб-адрес формы просмотра элементов списка
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Абсолютный веб-адрес формы просмотра элементов списка</returns>
         public string GetFullDisplayFormUrl(SPWeb web)
         {
@@ -1085,7 +1098,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить абсолютный веб-адрес формы просмотра сущности
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Абсолютный веб-адрес формы просмотра сущности</returns>
         public string GetFullDisplayFormUrl(SPWeb web, TEntity entity)
         {
@@ -1095,7 +1108,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить абсолютный веб-адрес формы просмотра сущности по её идентификатору
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="id">Идентификатор сущности</param>
         /// <returns>Абсолютный веб-адрес формы просмотра сущности</returns>
         public string GetFullDisplayFormUrl(SPWeb web, int id)
@@ -1106,7 +1119,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить абсолютный веб-адрес формы создания сущности
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Абсолютный веб-адрес формы создания сущности</returns>
         public string GetFullNewFormUrl(SPWeb web, TEntity entity)
         {
@@ -1116,7 +1129,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить абсолютный веб-адрес формы создания сущности по её идентификатору
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="id">Идентификатор сущности</param>
         /// <returns>Абсолютный веб-адрес формы создания сущности</returns>
         public string GetFullNewFormUrl(SPWeb web, int id)
@@ -1127,7 +1140,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить абсолютный веб-адрес формы изменения сущности
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Абсолютный веб-адрес формы изменения сущности</returns>
         public string GetFullEditFormUrl(SPWeb web, TEntity entity)
         {
@@ -1137,7 +1150,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить абсолютный веб-адрес формы изменения сущности по её идентификатору
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="id">Идентификатор сущности</param>
         /// <returns>Абсолютный веб-адрес формы изменения сущности</returns>
         public string GetFullEditFormUrl(SPWeb web, int id)
@@ -1148,7 +1161,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить абсолютный Url-адрес формы для сущности
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="pagetype">Тип формы</param>
         /// <param name="entity">Сущность</param>
         /// <returns>Абсолютный веб-адрес формы сущности</returns>
@@ -1160,7 +1173,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить абсолютный Url-адрес формы для сущности по её идентификатору
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="pagetype">Тип формы</param>
         /// <param name="id">Идентификатор сущности</param>
         /// <returns>Абсолютный веб-адрес формы сущности</returns>
@@ -1174,7 +1187,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить веб-адрес формы просмотра элементов списка (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Веб-адрес формы просмотра элементов списка</returns>
         public string GetDisplayFormUrl(SPWeb web)
         {
@@ -1185,7 +1198,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить веб-адрес формы просмотра сущности (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Веб-адрес формы просмотра сущности</returns>
         public string GetDisplayFormUrl(SPWeb web, TEntity entity)
         {
@@ -1195,7 +1208,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить веб-адрес формы просмотра сущности по её идентификатору (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="id">Идентификатор сущности</param>
         /// <returns>Веб-адрес формы просмотра сущности</returns>
         public string GetDisplayFormUrl(SPWeb web, int id)
@@ -1206,7 +1219,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить веб-адрес формы создания элементов списка (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Веб-адрес формы создания элементов списка</returns>
         public string GetNewFormUrl(SPWeb web)
         {
@@ -1217,7 +1230,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить веб-адрес формы создания элементов списка с указанным ContentTypeId (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Веб-адрес формы создания элементов списка</returns>
         public string GetNewFormUrl(SPWeb web, SPContentTypeId contentTypeId)
         {
@@ -1229,7 +1242,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить веб-адрес формы редактирования элементов списка (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Веб-адрес формы редактирования элементов списка</returns>
         public string GetEditFormUrl(SPWeb web)
         {
@@ -1240,7 +1253,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить веб-адрес формы редактирования сущности (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <returns>Веб-адрес формы редактирования сущности</returns>
         public string GetEditFormUrl(SPWeb web, TEntity entity)
         {
@@ -1250,7 +1263,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить веб-адрес формы редактирования сущности по её идентификатору (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="id">Идентификатор сущности</param>
         /// <returns>Веб-адрес формы редактирования сущности</returns>
         public string GetEditFormUrl(SPWeb web, int id)
@@ -1261,7 +1274,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить Url-адрес формы для сущности (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="pagetype">Тип формы</param>
         /// <param name="entity">Сущность</param>
         /// <returns>Веб-адрес формы сущности</returns>
@@ -1273,7 +1286,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Получить Url-адрес формы для сущности по её идентификатору (адрес относительно сервера)
         /// </summary>
-        /// <param name="web">Сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="pagetype">Тип формы</param>
         /// <param name="id">Идентификатор сущности</param>
         /// <returns>Веб-адрес формы сущности</returns>
@@ -1291,7 +1304,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Загрузить файл в библиотеку документов с указанием папки для загрузки
         /// </summary>
-        /// <param name="web">Веб-сайт библиотеки</param>
+        /// <param name="web">Web which contains the library</param>
         /// <param name="folderRelativeUrl">Относительный адрес папки</param>
         /// <param name="fileName">Наименование файла</param>
         /// <param name="content">Содержимое файла</param>
@@ -1306,7 +1319,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Загрузить файл в библиотеку документов с указанием папки для загрузки
         /// </summary>
-        /// <param name="web">Веб-сайт библиотеки</param>
+        /// <param name="web">Web which contains the library</param>
         /// <param name="folderRelativeUrl">Относительный адрес папки</param>
         /// <param name="fileName">Наименование файла</param>
         /// <param name="stream">Поток байтов файла</param>
@@ -1321,7 +1334,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Загрузить файл в библиотеку документов
         /// </summary>
-        /// <param name="web">Веб-сайт библиотеки</param>
+        /// <param name="web">Web which contains the library</param>
         /// <param name="fileName">Наименование файла</param>
         /// <param name="content">Содержимое файла</param>
         /// <param name="replaceExistingFiles">Заменять существующие файлы</param>
@@ -1335,7 +1348,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Загрузить файл в библиотеку документов
         /// </summary>
-        /// <param name="web">Веб-сайт библиотеки</param>
+        /// <param name="web">Web which contains the library</param>
         /// <param name="fileName">Наименование файла</param>
         /// <param name="stream">Поток байтов файла</param>
         /// <param name="replaceExistingFiles">Заменять существующие файлы</param>
@@ -1352,7 +1365,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Загрузить файл в папку
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="targetFolder">Целевая папка</param>
         /// <param name="fileName">Наименование файла</param>
         /// <param name="content">Содержимое файла</param>
@@ -1371,7 +1384,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Загрузить файл в папку
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="targetFolder">Целевая папка</param>
         /// <param name="fileName">Наименование файла</param>
         /// <param name="stream">Поток байтов файла</param>
@@ -1393,7 +1406,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Возвращает вложения к сущности
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность</param>
         /// <returns>Вложения</returns>
         public SPFile[] GetAttachments(SPWeb web, TEntity entity)
@@ -1405,7 +1418,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Загрузить вложение к сущности
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность</param>
         /// <param name="content">Бинарное содержимое файла вложения</param>
         /// <returns>Загруженное вложение</returns>
@@ -1420,7 +1433,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Загрузить вложение к сущности
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность</param>
         /// <param name="stream">Поток байтов файла вложения</param>
         /// <returns>Загруженное вложение</returns>
@@ -1436,7 +1449,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Удалить вложение сущности
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность</param>
         /// <param name="name">Название вложения</param>
         public void DeleteAttachment(SPWeb web, TEntity entity, string name)
@@ -1452,7 +1465,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Разблокирует файл библиотеки (не зависимо от учетной записи), связанный с сущностью
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность</param>
         public void Unlock(SPWeb web, TEntity entity)
         {
@@ -1470,7 +1483,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Разблокирует файл библиотеки, связанный с сущностью и заблокированный ранее текущим пользователем
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность</param>
         public void ReleaseLock(SPWeb web, TEntity entity)
         {
@@ -1539,7 +1552,7 @@ namespace SP2016.Repository
         /// <summary>
         /// Проверить существует ли сущность с указанным идентификатором на веб-сайте
         /// </summary>
-        /// <param name="web">Веб-сайт</param>
+        /// <param name="web">Web which contains the list</param>
         /// <param name="id">Идентификатор сущности</param>
         /// <returns>True - если сущность существует на указанном веб-сайте, в противном случае - false</returns>
         public bool EntityExists(SPWeb web, int id)
