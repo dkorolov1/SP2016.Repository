@@ -36,7 +36,7 @@
         /// </summary>
         /// <param name="context">Node which contains the repository</param>
         /// <param name="recursive">Include entities from sub-repositories</param>
-        TEntity[] GetAllEntities(TContext context, bool recursive);
+        TEntity[] GetAllEntities(TContext context);
 
         /// <summary>
         /// Delete an entity

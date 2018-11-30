@@ -71,6 +71,11 @@ namespace SP2016.Repository
             return (recursive) ? GetEntities(web, query.Query, recursive) : GetEntities(web, query);
         }
 
+        public TEntity[] GetAllEntities(SPWeb web)
+        {
+            return GetAllEntities(web, false);
+        }
+
         #endregion
 
         #region Getting entities with filtering
