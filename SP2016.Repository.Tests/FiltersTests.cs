@@ -37,11 +37,11 @@ namespace SP2016.Repository.Tests
         [TestMethod]
         public void GetEntities_FromSpecificFolder_EqualAmount()
         {
+            var folderPath = "Old men";
+
             Perform(web => {
                 try
                 {
-                    var folderPath = "Old men";
-
                     UsersRepository.Add(web, folderPath, MockUsers.User1);
                     UsersRepository.Add(web, folderPath, MockUsers.User2);
 
@@ -52,6 +52,7 @@ namespace SP2016.Repository.Tests
                 finally
                 {
                     UsersRepository.DeleteAll(web);
+                    UsersRepository.DeleteFolder(web, folderPath);
                 }
             });
         }

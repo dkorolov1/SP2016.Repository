@@ -22,7 +22,7 @@ namespace SP2016.Repository
     /// the SharePoint calls from custom code.
     /// </summary>
     /// <typeparam name="TEntity">Конкретная сущность, для которой создается репозиторий</typeparam>
-    public abstract class BaseEntityRepository<TEntity> : ISharePointRepository<TEntity> where TEntity : BaseEntity, new()
+    public abstract class BaseSharePointRepository<TEntity> : ISharePointRepository<TEntity> where TEntity : BaseEntity, new()
     {
         protected virtual FieldToEntityPropertyMapping[] FieldMappings => new FieldToEntityPropertyMapping[0];
         public abstract string ListName { get; }
@@ -39,7 +39,7 @@ namespace SP2016.Repository
             new FieldToEntityPropertyMapping("FileLeafRef", true)
         };
         
-        public BaseEntityRepository()
+        public BaseSharePointRepository()
         {
             var intersectedMappings = FieldMappings
                 .Intersect(DefaultFieldMappings, new FieldToEntityPropertyMappingComparer())

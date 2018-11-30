@@ -83,7 +83,7 @@
     <Compile Include="Utils\BatchUtil.cs" />
     <Compile Include="Utils\ItemFieldsChecking.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BaseEntityRepository.cs" />
+    <Compile Include="BaseSharePointRepository.cs" />
     <Compile Include="Caml\CamlFilter.cs" />
     <Compile Include="Caml\CamlQueryBuilder.cs" />
     <Compile Include="Caml\RepositoryCamlBuilder.cs" />
@@ -119,8 +119,7 @@
     <Compile Include="Converters\Default\SingleConverter.cs" />
     <Compile Include="Converters\Default\StringValueConverter.cs" />
     <Compile Include="Attributes\FieldMappingAttribute.cs" />
-    <Compile Include="IBaseEntityRepository.cs" />
-    <Compile Include="IBaseRepository.cs" />
+    <Compile Include="IRepository.cs" />
     <Compile Include="Mapping\ListItemFieldMappingException.cs" />
     <Compile Include="Mapping\FieldToPropertyMapper.cs" />
     <Compile Include="Mapping\FieldToEntityPropertyMapping.cs" />
