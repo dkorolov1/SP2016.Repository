@@ -318,24 +318,14 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region First and last entities
-
-        private TEntity[] GetFirstOrLastEntities(SPWeb web, uint numberOfEntities, SortOrder sortOrder)
-        {
-            Query query = new Query();
-            query.OrderBy.Add(new FieldReference("ID", sortOrder));
-
-            return GetEntities(web, query, numberOfEntities);
-        }
-
-        public TEntity[] GetFirstEntities(SPWeb web, uint numberOfEntities)
-        {
-            return GetFirstOrLastEntities(web, numberOfEntities, SortOrder.Ascending);
-        }
+        #region Getting last created entities
 
         public TEntity[] GetLastEntities(SPWeb web, uint numberOfEntities)
         {
-            return GetFirstOrLastEntities(web, numberOfEntities, SortOrder.Descending);
+            var query = new Query();
+            query.OrderBy.Add(new FieldReference("ID", SortOrder.Descending));
+
+            return GetEntities(web, query, numberOfEntities);
         }
 
         #endregion
