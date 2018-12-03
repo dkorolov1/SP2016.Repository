@@ -60,6 +60,7 @@
     <Compile Include="Data\Users\Seniority.cs" />
     <Compile Include="Data\Users\UserEntity.cs" />
     <Compile Include="Data\Users\UsersRepository.cs" />
+    <Compile Include="EntitiesAdditionTests.cs" />
     <Compile Include="EntityCreationTests.cs" />
     <Compile Include="FiltersTests.cs" />
     <Compile Include="GetAllEntitiesTest.cs" />

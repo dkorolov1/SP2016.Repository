@@ -463,28 +463,18 @@ namespace SP2016.Repository
         #region Добавление элементов
 
         /// <summary>
-        /// Добавление нового элемента
-        /// </summary>
-        /// <param name="web">Web which contains the list</param>
-        /// <param name="entity">Сущность с данными для добавления</param>
-        /// <returns>Идентификатор созданного элемента</returns>
-        private void AddListItem(SPWeb web, TEntity entity)
-        {
-            SPListItem newItem = web.Lists[this.ListName].Items.Add();
-            UpdateListItemInternal(web, entity, newItem);
-
-            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, typeof(TEntity), newItem);
-        }
-
-        /// <summary>
         /// Добавить сущность
         /// </summary>
         /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для добавления</param>
         public virtual void Add(SPWeb web, TEntity entity)
         {
-            AddListItem(web, entity);
-            entity.ListItem = GetList(web).GetItemById(entity.ID);
+            var newItem = web.Lists[ListName].Items.Add();
+            UpdateListItemInternal(web, entity, newItem);
+
+            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, typeof(TEntity), newItem);
+
+            entity.ListItem = newItem;
         }
 
         /// <summary>
@@ -543,8 +533,7 @@ namespace SP2016.Repository
         {
             foreach (var entity in entities)
             {
-                AddListItem(web, entity);
-                entity.ListItem = this.GetList(web).GetItemById(entity.ID);
+                Add(web, entity);
             }
         }
 
@@ -620,7 +609,7 @@ namespace SP2016.Repository
         /// <param name="entities">Сущности</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после добавления блока элементов. Принимает количество добавленных элементов</param>
-        public void AddBatch(TEntity[] entities, SPWeb web, int blocksize = 1000, Action<int> batchFinishedFunc = null)
+        public void AddBatch(SPWeb web, TEntity[] entities, int blocksize = 1000, Action<int> batchFinishedFunc = null)
         {
             string command = "<Method ID=\"{0}\"><SetList>{1}</SetList><SetVar Name=\"ID\">New</SetVar><SetVar Name=\"Cmd\">Save</SetVar>{3}</Method>";
             BatchUtil.ProcessBatch(entities, web, ListName, ListItemFieldMapper, command, blocksize);
@@ -634,15 +623,15 @@ namespace SP2016.Repository
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после добавления блока элементов. Принимает количество добавленных элементов</param>
-        public void AddBatch(TEntity[] entities, SPWeb web, bool eventFiringEnabled, int blocksize = 1000, Action<int> batchFinishedFunc = null)
+        public void AddBatch(SPWeb web, TEntity[] entities, bool eventFiringEnabled, int blocksize = 1000, Action<int> batchFinishedFunc = null)
         {
             if (!eventFiringEnabled)
             {
                 using (new DisabledItemEventsScope())
-                    AddBatch(entities, web, blocksize, batchFinishedFunc);
+                    AddBatch(web, entities, blocksize, batchFinishedFunc);
             }
             else
-                AddBatch(entities, web, blocksize, batchFinishedFunc);
+                AddBatch(web, entities, blocksize, batchFinishedFunc);
         }
 
         /// <summary>
