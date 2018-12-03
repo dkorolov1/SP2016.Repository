@@ -233,24 +233,6 @@ namespace SP2016.Repository
         /// <summary>
         /// Получение коллекции сущностей
         /// </summary>
-        /// <param name="expr">Выражение для фильтрации</param>
-        /// <param name="web">Web which contains the list</param>
-        /// <param name="recursive">Получить элементы рекурсивно из папок</param>
-        /// <returns>Все сущности, удовлетворяющие запросу</returns>
-        public TEntity[] GetEntities(SPWeb web, object expr, uint rowLimit = 0)
-        {
-            var query = new Query
-            {
-                Where = (IExpression)expr,
-                Recursive = true
-            };
-
-            return GetEntities(web, query, rowLimit);
-        }
-
-        /// <summary>
-        /// Получение коллекции сущностей
-        /// </summary>
         /// <param name="web">Web which contains the list</param>
         /// <param name="query">Объект SPQuery, содержащий запрос</param>
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
