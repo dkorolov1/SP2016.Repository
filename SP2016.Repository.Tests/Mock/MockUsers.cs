@@ -20,7 +20,7 @@ namespace SP2016.Repository.Tests.Mock
         public readonly UserEntity User2 = new UserEntity
         {
             DisplayName = "Vlad L",
-            Dismissed = true,
+            Dismissed = false,
             Description = "Works with React.Js",
             BirthDate = new DateTime(2000, 1, 15),
             Link = new SPFieldUrlValue()

@@ -460,7 +460,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Добавление элементов
+        #region Add items
 
         /// <summary>
         /// Добавить сущность
@@ -677,7 +677,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Удаление элементов
+        #region Delete items
 
         /// <summary>
         /// Удалить все сущности
@@ -890,7 +890,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Обновление элементов
+        #region Update items
 
         /// <summary>
         /// Обновление сущности
@@ -905,7 +905,8 @@ namespace SP2016.Repository
             }
             catch (Exception ex)
             {
-                InvalidOperationException exception = new InvalidOperationException(string.Format("Ошибка при обновлении AfterProperties {0} узла {1}", ListName, web.Url), ex);
+                var exception = new InvalidOperationException(
+                    $"Error has occured while updating AfterProperties {ListName} on {web.Url}", ex);
                 throw exception;
             }
         }

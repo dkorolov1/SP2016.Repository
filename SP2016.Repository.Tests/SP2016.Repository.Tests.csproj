@@ -60,6 +60,7 @@
     <Compile Include="Data\Users\Seniority.cs" />
     <Compile Include="Data\Users\UserEntity.cs" />
     <Compile Include="Data\Users\UsersRepository.cs" />
+    <Compile Include="ItemsDeletionTests.cs" />
     <Compile Include="EntitiesAdditionTests.cs" />
     <Compile Include="EntityCreationTests.cs" />
     <Compile Include="FiltersTests.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Mock\MockDepartments.cs" />
     <Compile Include="Mock\MockUsers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UpdatingItemsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
