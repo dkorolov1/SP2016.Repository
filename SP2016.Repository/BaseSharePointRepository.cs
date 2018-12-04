@@ -1047,7 +1047,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Ссылки на формы
+        #region Links to the forms
 
         /// <summary>
         /// Получить веб-адрес представления по умолчанию списка
@@ -1056,7 +1056,7 @@ namespace SP2016.Repository
         /// <returns>Веб-адрес представления по умолчанию списка</returns>
         public string GetDefaultViewUrl(SPWeb web)
         {
-            SPList workList = this.GetList(web);
+            var workList = GetList(web);
             return workList.DefaultViewUrl;
         }
 
@@ -1067,8 +1067,8 @@ namespace SP2016.Repository
         /// <returns>Абсолютный веб-адрес формы просмотра элементов списка</returns>
         public string GetFullDisplayFormUrl(SPWeb web)
         {
-            SPList workList = this.GetList(web);
-            string formUrl = workList.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url;
+            var workList = GetList(web);
+            var formUrl = workList.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url;
             return SPUtility.ConcatUrls(web.Url, formUrl);
         }
 
@@ -1276,7 +1276,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Загрузить файл(ы)
+        #region Files uploading
 
         /// <summary>
         /// Загрузить файл в библиотеку документов с указанием папки для загрузки
