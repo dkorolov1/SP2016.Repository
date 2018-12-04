@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace SP2016.Repository.Converters.Default
 {
-    public class EnumConverter : BaseConverter
+    public class EnumConverter : SimpleConverter
     {
         public override object ConvertPropertyValueToFieldValue(object propertyValue)
         {

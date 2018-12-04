@@ -2,16 +2,14 @@
 
 namespace SP2016.Repository.Converters.Default
 {
-    public class BaseConverter
+    public class SimpleConverter : IConverter
     {
-        public PropertyInfo PropertyInfo { get; set; }
-
         /// <summary>
         /// Конвертируем значение свойства в значение поля
         /// </summary>
         /// <param name="propertyValue">Значение свойства</param>
         /// <returns>Значение поля</returns>
-        public virtual object ConvertPropertyValueToFieldValue(object propertyValue)
+        public virtual object ConvertPropertyValueToFieldValue(PropertyInfo PropertyInfo, object propertyValue)
         {
             return propertyValue;
         }
@@ -21,7 +19,7 @@ namespace SP2016.Repository.Converters.Default
         /// </summary>
         /// <param name="propertyValue">Значение свойства</param>
         /// <returns>Значение поля</returns>
-        public virtual object ConvertFieldValueToPropertyValue(object fieldValue)
+        public virtual object ConvertFieldValueToPropertyValue(PropertyInfo PropertyInfo, object fieldValue)
         {
             return fieldValue;
         }

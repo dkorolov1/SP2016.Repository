@@ -1,11 +1,18 @@
 ﻿using Microsoft.SharePoint;
-using SP2016.Repository.Converters.Default;
+using System.Reflection;
 
 namespace SP2016.Repository.Converters
 {
-    public class BaseSharePointConverter : BaseConverter
+    public class SharePointConverter : IConverter
     {
-        public SPField FieldInfo { get; set; }
-        public SPWeb Web { get; set; }
+        public virtual object ConvertPropertyValueToFieldValue(SPWeb web, PropertyInfo PropertyInfo, object propertyValue)
+        {
+            return propertyValue;
+        }
+
+        public virtual object ConvertFieldValueToPropertyValue(SPWeb web, PropertyInfo PropertyInfo, object fieldValue)
+        {
+            return fieldValue;
+        }
     }
 }

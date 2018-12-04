@@ -1,6 +1,6 @@
 ﻿namespace SP2016.Repository.Converters.Default
 {
-    public class BooleanConverter : BaseConverter
+    public class BooleanConverter : SimpleConverter
     {
         public override object ConvertPropertyValueToFieldValue(object propertyValue)
         {

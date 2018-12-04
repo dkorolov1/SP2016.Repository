@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace SP2016.Repository.Converters.Default
 {
-    public class DoubleConverter : BaseConverter
+    public class DoubleConverter : SimpleConverter
     {
         public override object ConvertPropertyValueToFieldValue(object propertyValue)
         {

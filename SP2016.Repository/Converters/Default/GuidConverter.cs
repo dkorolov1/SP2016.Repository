@@ -2,7 +2,7 @@
 
 namespace SP2016.Repository.Converters.Default
 {
-    public class GuidConverter : BaseConverter
+    public class GuidConverter : SimpleConverter
     {
         public override object ConvertPropertyValueToFieldValue(object propertyValue)
         {

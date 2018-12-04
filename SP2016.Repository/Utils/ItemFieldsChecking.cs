@@ -49,28 +49,5 @@ namespace SP2016.Repository
                 throw new Exception(errorMessage, ex);
             }
         }
-
-        /// <summary>
-        /// Проверка существования поля у элемента списка
-        /// </summary>
-        /// <param name="item">Элемент списка</param>
-        /// <param name="entityType">Тип сущности</param>
-        /// <param name="fieldMapping">Сопоставление, соответствующее проверяемому полю</param>
-        /// <returns>Поле, которое необходимо было проверить</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", Justification = "Используется для проверки сущствования поля", MessageId = "ensuredField")]
-        public static SPField EnsureListFieldID(SPListItemVersion item, Type entityType, FieldToPropertyMapping fieldMapping)
-        {
-            try
-            {
-                return item.Fields.GetField(fieldMapping.FieldName);
-            }
-            catch (ArgumentException ex)
-            {
-                string errorMessage = $@"SPListItem '{item.ListItem.Name}' does not have a field with Id '{fieldMapping.FieldName}' 
-                            which was mapped to property: '{fieldMapping.EntityPropertyName}' for entity '{entityType.FullName}'.";
-                throw new Exception(errorMessage, ex);
-            }
-        }
-
     }
 }

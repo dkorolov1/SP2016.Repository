@@ -2,7 +2,7 @@
 
 namespace SP2016.Repository.Converters.Default
 {
-    public class DateTimeConverter : BaseConverter
+    public class DateTimeConverter : SimpleConverter
     {
         public override object ConvertFieldValueToPropertyValue(object fieldValue)
         {

@@ -2,7 +2,7 @@
 
 namespace SP2016.Repository.Converters.Default
 {
-    public class StringValueConverter : BaseConverter
+    public class StringValueConverter : SimpleConverter
     {
         public override object ConvertFieldValueToPropertyValue(object fieldValue)
         {

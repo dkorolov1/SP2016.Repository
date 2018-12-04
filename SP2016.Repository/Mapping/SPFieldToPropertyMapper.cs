@@ -44,12 +44,16 @@ namespace SP2016.Repository.Mapping
 
         /// <summary>
         /// Получить название поля соответствующего свойству сущности
+        /// 
+        /// TODO :: remove
+        /// 
         /// </summary>
         /// <param name="propertyName">Свойство сущности</param>
         /// <returns>Display name поля</returns>
         public string GetFieldDisplayName(string propertyName)
         {
             string displayName = string.Empty;
+
             foreach (var mapping in Mappings)
             {
                 if (mapping.EntityPropertyName.Equals(propertyName))
@@ -58,19 +62,16 @@ namespace SP2016.Repository.Mapping
                     break;
                 }
             }
+
             if (string.IsNullOrEmpty(displayName))
-                throw new InvalidOperationException(string.Format("Не найдено соответствие для свойства {0}.", propertyName));
+                throw new InvalidOperationException($"Не найдено соответствие для свойства {propertyName}.");
 
             return displayName;
         }
 
-        #region Entity <-> Item
 
-        /// <summary>
-        /// Generate batch command based on the values in an entity.
-        /// </summary>
-        /// <param name="spList">Список</param>
-        /// <param name="entity">Сущность с данными</param>
+        #region batch
+
         [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
         public string GenerateBatchCommandFromEntity(SPWeb web, SPList spList, Type entityType, object entity)
         {
@@ -97,7 +98,11 @@ namespace SP2016.Repository.Mapping
             return builder.ToString();
         }
 
-        private IEnumerable<Tuple<string, object>> FieldNamesToValues(SPWeb web, SPList list, Type entityType, object entity)
+        #endregion
+
+        #region Item from Entity
+
+        private IEnumerable<(string, object)> FieldNamesToValues(SPWeb web, SPList list, Type entityType, object entity)
         {
             foreach (var mapping in Mappings)
             {
@@ -114,118 +119,86 @@ namespace SP2016.Repository.Mapping
                         var converter = GetAfterPropertiesFieldValuesConverter(web, propertyInfo, field);
                         fieldValue = converter.ConvertPropertyValueToFieldValue(propertyValue);
                     }
-                    yield return Tuple.Create(field.InternalName, propertyValue);
+
+                    yield return (field.InternalName, propertyValue);
                 }
             }
         }
 
-
-
-
-        /// <summary>
-        /// Заполнить AfterProperties на основе данных сущности
-        /// </summary>
-        /// <param name="properties"></param>
-        /// <param name="entity">Сущность с данными</param>
-        [SharePointPermissionAttribute(SecurityAction.LinkDemand, ObjectModel = true)]
+        [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
         public void FillAfterPropertiesFromEntity(SPWeb web, SPItemEventProperties properties, Type entityType, object entity)
         {
-            //Type entityType = typeof(TEntity);
-            foreach (var mapping in Mappings)
+            var fieldNamesToValues = FieldNamesToValues(web, properties.List, entityType, entity);
+            
+            foreach (var fieldNameToValue in fieldNamesToValues)
             {
-                if (!mapping.ReadOnly)
+                (string fieldName, object fieldValue) = fieldNameToValue;
+
+                try
                 {
-                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(entityType, mapping);
-                    SPField field = ItemFieldsChecking.EnsureListFieldID(properties.List, entityType, mapping);
-
-                    object propertyValue = propertyInfo.GetValue(entity, null);
-                    object fieldValue;
-
-                    if (propertyValue == null || string.IsNullOrEmpty(propertyValue.ToString()))
-                        fieldValue = null;
-                    else
-                        fieldValue = GetAfterPropertiesFieldValuesConverter(web, propertyInfo, field).ConvertPropertyValueToFieldValue(propertyValue);
-
-                    try
-                    {
-                        properties.AfterProperties[mapping.FieldName] = fieldValue;
-                    }
-                    catch (Exception ex)
-                    {
-                        string errorMessage = $@"Не удалось записать значение {fieldValue} в поле {mapping.FieldName} 
-                                для сущности {entityType.FullName}.";
-
-                        var nextException = new Exception(errorMessage, ex);
-                        logger.Error(errorMessage, nextException);
-                        throw nextException;
-                    }
+                    properties.AfterProperties[fieldName] = fieldValue;
+                }
+                catch (Exception ex)
+                {
+                    string errorMessage = $@"Не удалось записать значение {fieldValue} в поле {fieldName} 
+                            для сущности {entityType.FullName}.";
+                    var nextException = new Exception(errorMessage, ex);
+                    logger.Error(errorMessage, nextException);
+                    throw nextException;
                 }
             }
         }
-
-        /// <summary>
-        /// Заполнить SPListItem на основе данных сущности
-        /// </summary>
-        /// <param name="spListItem">Элемент списка</param>
-        /// <param name="entity">Сущность с данными</param>
+        
         [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
         public void FillSPListItemFromEntity(SPWeb web, SPListItem spListItem, Type entityType, object entity)
         {
-            //Type entityType = typeof(TEntity);
-            foreach (FieldToPropertyMapping fieldMapping in Mappings)
+            var fieldNamesToValues = FieldNamesToValues(web, spListItem.ParentList, entityType, entity);
+
+            foreach (var fieldNameToValue in fieldNamesToValues)
             {
-                if (!fieldMapping.ReadOnly)
+                (string fieldName, object fieldValue) = fieldNameToValue;
+
+                try
                 {
-                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(spListItem, entityType, fieldMapping);
-                    SPField field = ItemFieldsChecking.EnsureListFieldID(spListItem, entityType, fieldMapping);
-
-                    object propertyValue = propertyInfo.GetValue(entity, null);
-                    object fieldValue;
-
-                    if (propertyValue == null || string.IsNullOrEmpty(propertyValue.ToString()))
-                        fieldValue = null;
-                    else
-                        fieldValue = GetDefaultConverter(web, propertyInfo, field).ConvertPropertyValueToFieldValue(propertyValue);
-
-                    try
-                    {
-                        spListItem[fieldMapping.FieldName] = fieldValue;
-                    }
-                    catch (Exception ex)
-                    {
-                        string errorMessage = $@"Не удалось записать значение {fieldValue} в поле {fieldMapping.FieldName} 
+                    spListItem[fieldName] = fieldValue;
+                }
+                catch (Exception ex)
+                {
+                    string errorMessage = $@"Не удалось записать значение {fieldValue} в поле {fieldName} 
                                 для сущности {entityType.FullName}.";
-                        var nextException = new Exception(errorMessage, ex);
-                        logger.Error(errorMessage, nextException);
-                        throw nextException;
-                    }
+                    var nextException = new Exception(errorMessage, ex);
+                    logger.Error(errorMessage, nextException);
+                    throw nextException;
                 }
             }
         }
 
+        #endregion
 
+        #region Entity from Item
 
         public void FillEntityFromSPListItem(SPWeb web, object entity, Type entityType, SPListItem item)
         {
-            foreach (FieldToPropertyMapping fieldMapping in this.Mappings)
+            foreach (FieldToPropertyMapping fieldMapping in Mappings)
             {
                 try
                 {
                     PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(item, entityType, fieldMapping);
-                    ItemFieldsChecking.EnsureListFieldID(item, entityType, fieldMapping);
+
+                    // TODO :: Check field exists
+                    //ItemFieldsChecking.EnsureListFieldID(item, entityType, fieldMapping);
 
                     SPField field = item.Fields.GetField(fieldMapping.FieldName);
                     object fieldValue = item[fieldMapping.FieldName];
-                    object value;
 
-                    if (fieldValue == null || string.IsNullOrEmpty(fieldValue.ToString()))
-                        value = null;
+                    if (fieldValue is null || string.IsNullOrEmpty(fieldValue.ToString()))
+                        propertyInfo.SetValue(entity, null);
                     else
                     {
                         var converter = GetDefaultConverter(web, propertyInfo, field);
-                        value = converter.ConvertFieldValueToPropertyValue(fieldValue);
+                        var value = converter.ConvertFieldValueToPropertyValue(fieldValue);
+                        propertyInfo.SetValue(entity, value);
                     }
-                    propertyInfo.SetValue(entity, value, null);
                 }
                 catch (Exception ex)
                 {
@@ -248,7 +221,7 @@ namespace SP2016.Repository.Mapping
         public void FillEntityFromAfterProperties(SPWeb web, object entity, Type entityType, SPItemEventProperties properties)
         {
             SPList list = web.Lists[properties.ListId];
-            foreach (var fieldMapping in this.Mappings)
+            foreach (var fieldMapping in Mappings)
             {
 
                 try
@@ -296,32 +269,61 @@ namespace SP2016.Repository.Mapping
             }
         }
 
-
         #endregion
 
-        public virtual BaseConverter GetDefaultConverter(SPWeb web, PropertyInfo propertyInfo, SPField field)
+
+
+
+        public SimpleConverter GetDefaultConverter(SPWeb web, PropertyInfo propertyInfo, SPField field)
         {
             return GetFieldValuesConverter(web, propertyInfo, field);
         }
 
-        public BaseConverter GetBatchFieldValuesConverter(SPWeb web, PropertyInfo propertyInfo, SPField field)
+
+
+
+        public SimpleConverter GetBatchFieldValuesConverter(SPWeb web, PropertyInfo propertyInfo, SPField field)
         {
+            Dictionary<Type, SimpleConverter> BatchConvertersMapping = new Dictionary<Type, SimpleConverter>
+            {
+                { typeof(DateTime), new XmlDateTimeFieldValueConverter() },
+                { typeof(SPContentTypeId), new SPContentTypeIdValueConverter() },
+                { typeof(SPFieldUserValueCollection), new SPFieldUserValueCollectionConverter() },
+            };
+
             return GetFieldValuesConverter(web, propertyInfo, field, BatchConvertersMapping);
         }
 
-        public BaseConverter GetAfterPropertiesFieldValuesConverter(SPWeb web, PropertyInfo propertyInfo, SPField field)
+        public SimpleConverter GetAfterPropertiesFieldValuesConverter(SPWeb web, PropertyInfo propertyInfo, SPField field)
         {
+            Dictionary<Type, SimpleConverter> AfterPropertiesConvertersMapping = new Dictionary<Type, SimpleConverter>
+            {
+                { typeof(DateTime), new XmlDateTimeFieldValueConverter() },
+                { typeof(SPContentTypeId), new SPContentTypeIdValueConverter() },
+                { typeof(SPFieldUserValueCollection), new SPFieldUserValueCollectionConverter() },
+            };
+
             return GetFieldValuesConverter(web, propertyInfo, field, AfterPropertiesConvertersMapping);
         }
 
-        public BaseConverter GetItemVersionFieldValuesConverter(SPWeb web, PropertyInfo propertyInfo, SPField field)
+        public SimpleConverter GetItemVersionFieldValuesConverter(SPWeb web, PropertyInfo propertyInfo, SPField field)
         {
+            Dictionary<Type, SimpleConverter> ItemVersionConvertersMapping = new Dictionary<Type, SimpleConverter>
+            {
+                { typeof(DateTime), new ItemVersionDateTimeConverter() }
+            };
+
             return GetFieldValuesConverter(web, propertyInfo, field, ItemVersionConvertersMapping);
         }
 
-        private BaseConverter GetFieldValuesConverter(SPWeb web, PropertyInfo propertyInfo, SPField field, Dictionary<Type, BaseConverter> customConvertersMapping = null)
+
+
+
+        private SimpleConverter GetFieldValuesConverter(SPWeb web, PropertyInfo propertyInfo, SPField field, Dictionary<Type, SimpleConverter> customConvertersMapping = null)
         {
+            //get custom converter
             var converter = GetConverterForProperty(propertyInfo, customConvertersMapping);
+
             if (converter is BaseSharePointConverter)
             {
                 var sharePointConverter = (BaseSharePointConverter)converter;
@@ -330,28 +332,5 @@ namespace SP2016.Repository.Mapping
             }
             return converter;
         }
-
-        private readonly Dictionary<Type, BaseConverter> ItemVersionConvertersMapping = new Dictionary<Type, BaseConverter>
-        {
-            { typeof(DateTime), new ItemVersionDateTimeConverter() }
-        };
-
-        private readonly Dictionary<Type, BaseConverter> AfterPropertiesConvertersMapping = new Dictionary<Type, BaseConverter>
-        {
-            { typeof(DateTime), new XmlDateTimeFieldValueConverter() },
-            { typeof(SPContentTypeId), new SPContentTypeIdValueConverter() },
-            { typeof(SPContentType), new SPContentTypeValueConverter() },
-            { typeof(SPFieldUserValueCollection), new SPFieldUserValueCollectionConverter() },
-            { typeof(string), new AfterPropertiesStringValueConverter() },
-        };
-
-        private readonly Dictionary<Type, BaseConverter> BatchConvertersMapping = new Dictionary<Type, BaseConverter>
-        {
-            { typeof(DateTime), new XmlDateTimeFieldValueConverter() },
-            { typeof(SPContentTypeId), new SPContentTypeIdValueConverter() },
-            { typeof(SPContentType), new SPContentTypeValueConverter() },
-            { typeof(SPFieldUserValueCollection), new SPFieldUserValueCollectionConverter() },
-            { typeof(string), new BatchStringValueConverter() },
-        };
     }
 }

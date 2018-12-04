@@ -1463,26 +1463,6 @@ namespace SP2016.Repository
         }
 
         /// <summary>
-        /// Получение поля по имени свойства
-        /// </summary>
-        /// <param name="propertyName">Название свойства сущности</param>
-        /// <returns>Поле списка, соответствующее свойству сущности</returns>
-        public SPField GetField(SPWeb web, string propertyName)
-        {
-            try
-            {
-                string fieldName = ListItemFieldMapper.GetFieldDisplayName(propertyName);
-                SPList list = GetList(web);
-                return list.Fields.GetField(fieldName);
-            }
-            catch (Exception ex)
-            {
-                InvalidOperationException exception = new InvalidOperationException(string.Format("Ошибка при получении поля, соответствующего свойству {0}", propertyName), ex);
-                throw exception;
-            }
-        }
-
-        /// <summary>
         /// Create folder
         /// </summary>
         /// <param name="web">SharePoint Web</param>
@@ -1527,6 +1507,7 @@ namespace SP2016.Repository
             catch (Exception) { return false; }
         }
 
+        //TODO :: remove
         public TEntity[] GetEntities(SPWeb context, object expr, uint rowLimit)
         {
             throw new NotImplementedException();

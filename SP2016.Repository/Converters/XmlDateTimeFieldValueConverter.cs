@@ -7,15 +7,14 @@ namespace SP2016.Repository.Converters
     {
         public override object ConvertFieldValueToPropertyValue(object fieldValue)
         {
-            DateTime value = (DateTime.ParseExact(fieldValue.ToString(), "yyyy-MM-ddTHH:mm:ssZ", null)).ToUniversalTime();
+            DateTime value = DateTime.ParseExact(fieldValue.ToString(), "yyyy-MM-ddTHH:mm:ssZ", null).ToUniversalTime();
             return value;
         }
 
         public override object ConvertPropertyValueToFieldValue(object propertyValue)
         {
-            if (propertyValue is DateTime)
+            if (propertyValue is DateTime value)
             {
-                DateTime value = (DateTime)propertyValue;
                 return SPUtility.CreateISO8601DateTimeFromSystemDateTime(value);
             }
             else

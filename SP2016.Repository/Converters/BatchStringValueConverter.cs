@@ -17,7 +17,7 @@ namespace SP2016.Repository.Converters
             if (FieldInfo.Type != SPFieldType.Note)
                 return value;
 
-            return String.Format("<![CDATA[{0}]]>", value);
+            return $"<![CDATA[{value}]]>";
         }
     }
 }
