@@ -25,7 +25,7 @@ namespace SP2016.Repository.Tests
             var filter1 = new Filter(Enums.FilterType.Contains, "JobTitle", jobTitle, FilterValueType.Text);
             var query = new Query(filter1);
 
-            return GetEntities(web, filter1, rowLimit);
+            return GetEntities(web, filter1, true, rowLimit);
         }
     }
 }
