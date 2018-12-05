@@ -54,20 +54,20 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttachmentsTests.cs" />
-    <Compile Include="BaseRepoTest.cs" />
+    <Compile Include="Repository\AttachmentsTests.cs" />
+    <Compile Include="Repository\BaseRepoTest.cs" />
     <Compile Include="Data\Departments\DepartmentEntity.cs" />
     <Compile Include="Data\Departments\DepartmentsRepository.cs" />
     <Compile Include="Data\Users\Seniority.cs" />
     <Compile Include="Data\Users\UserEntity.cs" />
     <Compile Include="Data\Users\UsersRepository.cs" />
-    <Compile Include="GettingLinksToTheFormsTests.cs" />
-    <Compile Include="ItemsDeletionTests.cs" />
-    <Compile Include="EntitiesAdditionTests.cs" />
-    <Compile Include="EntityCreationTests.cs" />
-    <Compile Include="FiltersTests.cs" />
-    <Compile Include="GetAllEntitiesTest.cs" />
-    <Compile Include="GetLastEntitiesTests.cs" />
+    <Compile Include="Repository\GettingLinksToTheFormsTests.cs" />
+    <Compile Include="Repository\ItemsDeletionTests.cs" />
+    <Compile Include="Repository\EntitiesAdditionTests.cs" />
+    <Compile Include="Repository\EntityCreationTests.cs" />
+    <Compile Include="Repository\FiltersTests.cs" />
+    <Compile Include="Repository\GetAllEntitiesTest.cs" />
+    <Compile Include="Repository\GetLastEntitiesTests.cs" />
     <Compile Include="Mock\MockDepartments.cs" />
     <Compile Include="Mock\MockUsers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

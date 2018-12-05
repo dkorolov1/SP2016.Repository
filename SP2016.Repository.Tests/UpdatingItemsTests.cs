@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SP2016.Repository.Tests
+namespace SP2016.Repository.Tests.Repository
 {
     [TestClass]
     public class UpdatingItemsTests : BaseRepoTest

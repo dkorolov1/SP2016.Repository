@@ -1,11 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SP2016.Repository.Tests
+namespace SP2016.Repository.Tests.Repository
 {
     [TestClass]
     public class GettingLinksToTheFormsTests : BaseRepoTest

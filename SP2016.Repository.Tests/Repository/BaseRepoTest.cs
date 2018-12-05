@@ -2,7 +2,7 @@
 using SP2016.Repository.Tests.Mock;
 using System;
 
-namespace SP2016.Repository.Tests
+namespace SP2016.Repository.Tests.Repository
 {
     public class BaseRepoTest
     {
