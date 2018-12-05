@@ -53,8 +53,8 @@ namespace SP2016.Repository.Tests
 
                     Assert.AreEqual(2, userDocs.Length);
 
-                    Assert.AreEqual("CV", userDocs[0].Name);
-                    Assert.AreEqual("Timesheet", userDocs[1].Name);
+                    Assert.IsTrue(userDocs.Any(d => d.Name == "CV"), "There is now attachment with \"CV\" title");
+                    Assert.IsTrue(userDocs.Any(d => d.Name == "Timesheet"), "There is now attachment with \"Timesheet\" title");
                 }
                 finally
                 {
