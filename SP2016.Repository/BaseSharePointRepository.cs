@@ -424,21 +424,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Добавление элементов
-
-        /// <summary>
-        /// Добавление нового элемента
-        /// </summary>
-        /// <param name="web">Web which contains the list</param>
-        /// <param name="entity">Сущность с данными для добавления</param>
-        /// <returns>Идентификатор созданного элемента</returns>
-        private void AddListItem(SPWeb web, TEntity entity)
-        {
-            SPListItem newItem = web.Lists[this.ListName].Items.Add();
-            UpdateListItemInternal(web, entity, newItem);
-
-            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, typeof(TEntity), newItem);
-        }
+        #region Add items
 
         /// <summary>
         /// Добавить сущность
@@ -447,8 +433,12 @@ namespace SP2016.Repository
         /// <param name="entity">Сущность для добавления</param>
         public virtual void Add(SPWeb web, TEntity entity)
         {
-            AddListItem(web, entity);
-            entity.ListItem = GetList(web).GetItemById(entity.ID);
+            var newItem = web.Lists[ListName].Items.Add();
+            UpdateListItemInternal(web, entity, newItem);
+
+            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, typeof(TEntity), newItem);
+
+            entity.ListItem = newItem;
         }
 
         /// <summary>
@@ -507,8 +497,7 @@ namespace SP2016.Repository
         {
             foreach (var entity in entities)
             {
-                AddListItem(web, entity);
-                entity.ListItem = this.GetList(web).GetItemById(entity.ID);
+                Add(web, entity);
             }
         }
 
@@ -584,7 +573,7 @@ namespace SP2016.Repository
         /// <param name="entities">Сущности</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после добавления блока элементов. Принимает количество добавленных элементов</param>
-        public void AddBatch(TEntity[] entities, SPWeb web, int blocksize = 1000, Action<int> batchFinishedFunc = null)
+        public void AddBatch(SPWeb web, TEntity[] entities, int blocksize = 1000, Action<int> batchFinishedFunc = null)
         {
             string command = "<Method ID=\"{0}\"><SetList>{1}</SetList><SetVar Name=\"ID\">New</SetVar><SetVar Name=\"Cmd\">Save</SetVar>{3}</Method>";
             BatchUtil.ProcessBatch(entities, web, ListName, ListItemFieldMapper, command, blocksize);
@@ -598,15 +587,15 @@ namespace SP2016.Repository
         /// <param name="eventFiringEnabled">true - если приемники событий должны срабатывать, false - в противном случае</param>
         /// <param name="blocksize">Количество удаляемых сущностей в рамках одного запроса к БД</param>
         /// <param name="batchFinishedFunc">Процедура, выполняемая после добавления блока элементов. Принимает количество добавленных элементов</param>
-        public void AddBatch(TEntity[] entities, SPWeb web, bool eventFiringEnabled, int blocksize = 1000, Action<int> batchFinishedFunc = null)
+        public void AddBatch(SPWeb web, TEntity[] entities, bool eventFiringEnabled, int blocksize = 1000, Action<int> batchFinishedFunc = null)
         {
             if (!eventFiringEnabled)
             {
                 using (new DisabledItemEventsScope())
-                    AddBatch(entities, web, blocksize, batchFinishedFunc);
+                    AddBatch(web, entities, blocksize, batchFinishedFunc);
             }
             else
-                AddBatch(entities, web, blocksize, batchFinishedFunc);
+                AddBatch(web, entities, blocksize, batchFinishedFunc);
         }
 
         /// <summary>
@@ -652,7 +641,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Удаление элементов
+        #region Delete items
 
         /// <summary>
         /// Удалить все сущности
@@ -865,7 +854,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Обновление элементов
+        #region Update items
 
         /// <summary>
         /// Обновление сущности
@@ -880,7 +869,8 @@ namespace SP2016.Repository
             }
             catch (Exception ex)
             {
-                InvalidOperationException exception = new InvalidOperationException(string.Format("Ошибка при обновлении AfterProperties {0} узла {1}", ListName, web.Url), ex);
+                var exception = new InvalidOperationException(
+                    $"Error has occured while updating AfterProperties {ListName} on {web.Url}", ex);
                 throw exception;
             }
         }
@@ -1021,7 +1011,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Ссылки на формы
+        #region Links to the forms
 
         /// <summary>
         /// Получить веб-адрес представления по умолчанию списка
@@ -1030,7 +1020,7 @@ namespace SP2016.Repository
         /// <returns>Веб-адрес представления по умолчанию списка</returns>
         public string GetDefaultViewUrl(SPWeb web)
         {
-            SPList workList = this.GetList(web);
+            var workList = GetList(web);
             return workList.DefaultViewUrl;
         }
 
@@ -1041,8 +1031,8 @@ namespace SP2016.Repository
         /// <returns>Абсолютный веб-адрес формы просмотра элементов списка</returns>
         public string GetFullDisplayFormUrl(SPWeb web)
         {
-            SPList workList = this.GetList(web);
-            string formUrl = workList.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url;
+            var workList = GetList(web);
+            var formUrl = workList.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url;
             return SPUtility.ConcatUrls(web.Url, formUrl);
         }
 
@@ -1250,7 +1240,7 @@ namespace SP2016.Repository
 
         #endregion
 
-        #region Загрузить файл(ы)
+        #region Files uploading
 
         /// <summary>
         /// Загрузить файл в библиотеку документов с указанием папки для загрузки

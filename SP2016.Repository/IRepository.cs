@@ -1,4 +1,4 @@
-﻿namespace SP2016.Repository
+namespace SP2016.Repository
 { 
     public interface IRepository<in TContext, TEntity> where TEntity : new()
     {
@@ -24,15 +24,7 @@
         TEntity GetEntityById(TContext context, int id);
 
         /// <summary>
-        /// Get entities by query
-        /// </summary>
-        /// <param name="context">Context</param>
-        /// <param name="expr">Query expression</param>
-        /// <param name="rowLimit">Max number of entities to be returned</param>
-        TEntity[] GetEntities(TContext context, object expr, uint rowLimit);
-
-        /// <summary>
-        /// Get all entities
+        /// Get collection of all existing entities
         /// </summary>
         /// <param name="context">Node which contains the repository</param>
         /// <param name="recursive">Include entities from sub-repositories</param>
