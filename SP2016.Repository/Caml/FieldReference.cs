@@ -28,7 +28,7 @@ namespace SP2016.Repository.Caml
         public FieldReference(string fieldInternalName, SortOrder sortOrder)
             : this(fieldInternalName)
         {
-            this.SortOrder = sortOrder;
+            SortOrder = sortOrder;
         }
 
         /// <summary>
@@ -45,9 +45,9 @@ namespace SP2016.Repository.Caml
 
         public object Clone()
         {
-            FieldReference newRefeerence = new FieldReference(this.FieldInternalName);
-            newRefeerence.SortOrder = this.SortOrder;
-            foreach (string key in this.CustomAttributes.Keys)
+            FieldReference newRefeerence = new FieldReference(FieldInternalName);
+            newRefeerence.SortOrder = SortOrder;
+            foreach (string key in CustomAttributes.Keys)
             {
                 newRefeerence.CustomAttributes[key] = this.CustomAttributes[key];
             }

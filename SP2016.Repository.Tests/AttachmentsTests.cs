@@ -1,11 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SP2016.Repository.Tests.Properties;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SP2016.Repository.Tests
 {
@@ -46,15 +41,17 @@ namespace SP2016.Repository.Tests
                     var user = MockUsers.User2;
                     UsersRepository.Add(web, user);
 
-                    user.ListItem.Attachments.AddNow("CV", Resources.Test_document);
-                    user.ListItem.Attachments.AddNow("Timesheet", Resources.Employee_time_sheet_sample);
+                    string cvDocName = "CV";
+                    string timesheetDocName = "Timesheet";
+
+                    user.ListItem.Attachments.AddNow(cvDocName, Resources.Test_document);
+                    user.ListItem.Attachments.AddNow(timesheetDocName, Resources.Employee_time_sheet_sample);
 
                     var userDocs = UsersRepository.GetAttachments(web, user);
 
                     Assert.AreEqual(2, userDocs.Length);
-
-                    Assert.AreEqual("CV", userDocs[0].Name);
-                    Assert.AreEqual("Timesheet", userDocs[1].Name);
+                    Assert.IsTrue(userDocs.Any(d => d.Name == cvDocName));
+                    Assert.IsTrue(userDocs.Any(d => d.Name == timesheetDocName));
                 }
                 finally
                 {
