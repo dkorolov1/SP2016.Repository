@@ -23,14 +23,13 @@ namespace SP2016.Repository.Caml
         {
             get
             {
-                if (FieldReferences == null)
+                if (FieldReferences == null || FieldReferences.Length == 0)
                     return null;
-                if (FieldReferences.Length == 0)
-                    return null;
+
                 if (FieldReferences.Length > 1)
                     throw new InvalidOperationException("Нельзя использовать FieldReference при более чем 1 ссылке на поле, используйте FieldReferences");
-                return FieldReferences[0];
 
+                return FieldReferences[0];
             }
             set
             {
@@ -65,8 +64,10 @@ namespace SP2016.Repository.Caml
         {
             if (fieldInternalNames == null || fieldInternalNames.Length == 0)
                 throw new InvalidOperationException("Список полей для фильтрации не может быть пустым");
-            this.FilterType = filterType;
-            this.FieldReferences = new FieldReference[fieldInternalNames.Length];
+
+            FilterType = filterType;
+            FieldReferences = new FieldReference[fieldInternalNames.Length];
+
             for (int i = 0; i < fieldInternalNames.Length; i++)
             {
                 this.FieldReferences[i] = new FieldReference(fieldInternalNames[i]);

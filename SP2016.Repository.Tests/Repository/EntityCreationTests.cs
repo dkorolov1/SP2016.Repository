@@ -1,7 +1,4 @@
-﻿using Microsoft.SharePoint;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Reflection;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SP2016.Repository.Tests.Repository
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.SharePoint;
 using SP2016.Repository.Batch;
 using SP2016.Repository.Entities;
-using SP2016.Repository.Mapping;
+using SP2016.Repository.Mapping.SharePoint;
 using System;
 using System.IO;
 using System.Text;
@@ -11,15 +11,20 @@ namespace SP2016.Repository.Utils
 {
     public static class BatchUtil
     {
-        public static void ProcessBatch<TEntity>(TEntity[] entities, SPWeb web, string listName, SPFieldToPropertyMapper listItemFieldMapper, string commandFormat, int blocksize) where TEntity : IEntity
+        public static void ProcessBatch<TEntity>(TEntity[] entities, SPWeb web, string listName, SPBatchMapper<TEntity> spBatchMapper, string commandFormat, int blocksize) where TEntity : BaseEntity
         {
-            if (blocksize < 1) throw new ArgumentOutOfRangeException("blocksize", "Размер блока должен быть натуральным числом");
-            if (entities == null || entities.Length < 1) return;
+            if (blocksize < 1)
+                throw new ArgumentOutOfRangeException("blocksize", "Размер блока должен быть натуральным числом");
+
+            if (entities == null || entities.Length < 1)
+                return;
+
             SPList list = web.Lists[listName];
 
             using (new AllowUnsafeUpdates(web))
             {
                 StringBuilder builder = null;
+
                 for (int i = 0; i < entities.Length; i++)
                 {
                     if (i % blocksize == 0)
@@ -32,8 +37,9 @@ namespace SP2016.Repository.Utils
                         builder.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Batch OnError=\"Continue\">");
                     }
 
-                    string fields = listItemFieldMapper.GenerateBatchCommandFromEntity(web, list, typeof(TEntity), entities[i]);
-                    string command = string.Format(commandFormat, i, list.ID, entities[i].ID, fields);
+                    StringBuilder batchCommand = new StringBuilder();
+                    spBatchMapper.Map(web, list, batchCommand, entities[i]);
+                    string command = string.Format(commandFormat, i, list.ID, entities[i].ID, batchCommand.ToString());
 
                     builder.Append(command);
                 }

@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,6 +45,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,33 +56,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Converters\BaseSharePointConverter.cs" />
-    <Compile Include="Batch\Batch.cs" />
-    <Compile Include="Batch\Method.cs" />
+    <Compile Include="Converters\SharePoint\SharePointConverter.cs" />
     <Compile Include="Batch\ResultEntry.cs" />
     <Compile Include="Batch\Results.cs" />
     <Compile Include="Batch\SetFieldValue.cs" />
-    <Compile Include="Batch\SetList.cs" />
-    <Compile Include="Converters\AfterPropertiesStringValueConverter.cs" />
-    <Compile Include="Converters\BatchStringValueConverter.cs" />
-    <Compile Include="Converters\CalendarReccurenceDataConverter.cs" />
-    <Compile Include="Converters\ItemVersionDateTimeConverter.cs" />
-    <Compile Include="Converters\SPContentTypeIdValueConverter.cs" />
-    <Compile Include="Converters\SPContentTypeValueConverter.cs" />
-    <Compile Include="Converters\SPFieldCalculatedValueConverter.cs" />
-    <Compile Include="Converters\SPFieldLookupConverter.cs" />
-    <Compile Include="Converters\SPFieldMultiChoiceValueConverter.cs" />
-    <Compile Include="Converters\SPFieldUrlValueConverter.cs" />
-    <Compile Include="Converters\SPFieldUserConverter.cs" />
-    <Compile Include="Converters\SPFieldUserValueCollectionConverter.cs" />
-    <Compile Include="Converters\SPPrincipalConverter.cs" />
-    <Compile Include="Converters\SPPrincipalInfoConverter.cs" />
-    <Compile Include="Converters\XmlDateTimeFieldValueConverter.cs" />
+    <Compile Include="Converters\SharePoint\BatchStringValueConverter.cs" />
+    <Compile Include="Converters\SharePoint\CalendarReccurenceDataConverter.cs" />
+    <Compile Include="Converters\IConverter.cs" />
+    <Compile Include="Converters\SharePoint\ItemVersionDateTimeConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPContentTypeIdValueConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPContentTypeValueConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPFieldCalculatedValueConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPFieldLookupConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPFieldMultiChoiceValueConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPFieldUrlValueConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPFieldUserConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPFieldUserValueCollectionConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPPrincipalConverter.cs" />
+    <Compile Include="Converters\SharePoint\SPPrincipalInfoConverter.cs" />
+    <Compile Include="Converters\SharePoint\XmlDateTimeFieldValueConverter.cs" />
     <Compile Include="Entities\BaseEntity.cs" />
     <Compile Include="FieldToEntityPropertyMappingComparer.cs" />
+    <Compile Include="Mapping\SharePoint\SPAfterPropertiesMapper.cs" />
+    <Compile Include="Mapping\SharePoint\SPMappersFactory.cs" />
+    <Compile Include="Mapping\SharePoint\SPFieldMapper.cs" />
+    <Compile Include="Mapping\SharePoint\SPBatchMapper.cs" />
+    <Compile Include="Mapping\SharePoint\SPListItemMapper.cs" />
+    <Compile Include="Mapping\SharePoint\SPListItemVersionMapper.cs" />
     <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="ISharePointRepository.cs" />
-    <Compile Include="Mapping\ISPFieldToPropertyMapper.cs" />
     <Compile Include="Utils\AllowUnsafeUpdates.cs" />
     <Compile Include="Utils\BatchUtil.cs" />
     <Compile Include="Utils\ItemFieldsChecking.cs" />
@@ -109,37 +115,35 @@
     <Compile Include="Caml\SortOrder.cs" />
     <Compile Include="Constants\Constants.cs" />
     <Compile Include="Utils\CustomizedComparer.cs" />
-    <Compile Include="Converters\Default\BaseConverter.cs" />
-    <Compile Include="Converters\Default\BooleanConverter.cs" />
-    <Compile Include="Converters\Default\DateTimeConverter.cs" />
-    <Compile Include="Converters\Default\DoubleConverter.cs" />
-    <Compile Include="Converters\Default\EnumConverter.cs" />
-    <Compile Include="Converters\Default\GuidConverter.cs" />
-    <Compile Include="Converters\Default\Int32Converter.cs" />
-    <Compile Include="Converters\Default\SingleConverter.cs" />
-    <Compile Include="Converters\Default\StringValueConverter.cs" />
+    <Compile Include="Converters\Common\SimpleConverter.cs" />
+    <Compile Include="Converters\Common\BooleanConverter.cs" />
+    <Compile Include="Converters\Common\DateTimeConverter.cs" />
+    <Compile Include="Converters\Common\DoubleConverter.cs" />
+    <Compile Include="Converters\Common\EnumConverter.cs" />
+    <Compile Include="Converters\Common\GuidConverter.cs" />
+    <Compile Include="Converters\Common\Int32Converter.cs" />
+    <Compile Include="Converters\Common\SingleConverter.cs" />
+    <Compile Include="Converters\Common\StringValueConverter.cs" />
     <Compile Include="Attributes\FieldMappingAttribute.cs" />
     <Compile Include="IRepository.cs" />
-    <Compile Include="Mapping\ListItemFieldMappingException.cs" />
-    <Compile Include="Mapping\FieldToPropertyMapper.cs" />
-    <Compile Include="Mapping\FieldToEntityPropertyMapping.cs" />
+    <Compile Include="Mapping\FieldMapper.cs" />
+    <Compile Include="Mapping\FieldToPropertyMapping.cs" />
     <Compile Include="Entities\IEntity.cs" />
-    <Compile Include="Mapping\IListItemFieldMapper.cs" />
     <Compile Include="Utils\ReflectionUtil.cs" />
     <Compile Include="Logging\ILog.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Constants\SPConstants.cs" />
     <Compile Include="Utils\DisabledItemEventsScope.cs" />
     <Compile Include="Models\CalendarReccurenceData.cs" />
-    <Compile Include="Converters\ReccurenceDataConverter.cs" />
+    <Compile Include="Converters\SharePoint\ReccurenceDataConverter.cs" />
     <Compile Include="Service\FolderService.cs" />
     <Compile Include="Service\ListItemService.cs" />
     <Compile Include="Models\SPPrincipalInfo.cs" />
     <Compile Include="Service\ListService.cs" />
     <Compile Include="SPFieldCalculatedValue.cs" />
-    <Compile Include="Mapping\SPFieldToPropertyMapper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="sp2016repo.snk" />
   </ItemGroup>
   <ItemGroup />

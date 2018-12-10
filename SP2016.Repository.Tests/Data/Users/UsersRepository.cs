@@ -8,16 +8,16 @@ namespace SP2016.Repository.Tests
     {
         public override string ListName => "Users";
 
-        protected override FieldToEntityPropertyMapping[] FieldMappings => new FieldToEntityPropertyMapping[]
+        protected override FieldToPropertyMapping[] FieldMappings => new FieldToPropertyMapping[]
         {
-            new FieldToEntityPropertyMapping("Title", "DisplayName"),
-            new FieldToEntityPropertyMapping("Dismissed"),
-            new FieldToEntityPropertyMapping("Description"),
-            new FieldToEntityPropertyMapping("BirthDate"),
-            new FieldToEntityPropertyMapping("Department"),
-            new FieldToEntityPropertyMapping("Link"),
-            new FieldToEntityPropertyMapping("JobTitle"),
-            new FieldToEntityPropertyMapping("Seniority")
+            new FieldToPropertyMapping("Title", "DisplayName"),
+            new FieldToPropertyMapping("Dismissed"),
+            new FieldToPropertyMapping("Description"),
+            new FieldToPropertyMapping("BirthDate"),
+            new FieldToPropertyMapping("Department"),
+            new FieldToPropertyMapping("Link"),
+            new FieldToPropertyMapping("JobTitle"),
+            new FieldToPropertyMapping("Seniority")
         };
 
         public UserEntity[] GetByJobTitle(SPWeb web, string jobTitle, uint rowLimit = 0)

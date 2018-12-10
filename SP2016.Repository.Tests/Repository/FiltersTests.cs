@@ -7,34 +7,6 @@ namespace SP2016.Repository.Tests.Repository
     public class FiltersTests : BaseRepoTest
     {
         [TestMethod]
-        public void GetEntity_WithCustomStringCaml_ReturnsOneEntity()
-        {
-            Perform(web =>
-            {
-                try
-                {
-                    UsersRepository.AddRange(web, MockUsers.AllUsers);
-
-                    var camlQuery =
-                    "<Where>" +
-                        "<Contains>" +
-                            "<FieldRef Name=\"JobTitle\" />" +
-                            "<Value Type=\"Text\">ASP</Value>" +
-                        "</Contains>" +
-                    "</Where>";
-
-                    var entity = UsersRepository.GetEntity(web, camlQuery);
-
-                    Assert.IsTrue(entity.DisplayName == "Olga M" || entity.DisplayName == "Vitaly N");
-                }
-                finally
-                {
-                    UsersRepository.DeleteAll(web);
-                }
-            });
-        }
-
-        [TestMethod]
         public void GetEntities_FromSpecificFolder_EqualAmount()
         {
             var folderPath = "Old men";

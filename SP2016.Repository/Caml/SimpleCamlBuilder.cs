@@ -188,6 +188,7 @@ namespace SP2016.Repository.Caml
         {
             if (string.IsNullOrEmpty(fieldReference.FieldInternalName))
                 throw new InvalidOperationException("Внутренее имя поля не может быть пустым");
+
             string customAttributes = BuildCustomAttributes(fieldReference.CustomAttributes);
             if (fieldReference.SortOrder == SortOrder.None)
                 return string.Format(CultureInfo.CurrentCulture, "<FieldRef Name='{0}' {1}/>", fieldReference.FieldInternalName, customAttributes);

@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using Microsoft.SharePoint;
-using System.Globalization;
 using SP2016.Repository.Caml;
 using SP2016.Repository.Utils;
 using SP2016.Repository.Enums;
@@ -10,8 +9,8 @@ using SP2016.Repository.Mapping;
 using SP2016.Repository.Service;
 using System.Collections.Generic;
 using SP2016.Repository.Entities;
-using SP2016.Repository.Repository;
 using Microsoft.SharePoint.Utilities;
+using System.Text;
 
 namespace SP2016.Repository
 {
@@ -24,19 +23,19 @@ namespace SP2016.Repository
     /// <typeparam name="TEntity">Конкретная сущность, для которой создается репозиторий</typeparam>
     public abstract class BaseSharePointRepository<TEntity> : ISharePointRepository<TEntity> where TEntity : BaseEntity, new()
     {
-        protected virtual FieldToEntityPropertyMapping[] FieldMappings => new FieldToEntityPropertyMapping[0];
+        protected readonly SPMappersFactory<TEntity> SPMappersFactory;
+        protected virtual FieldToPropertyMapping[] FieldMappings => new FieldToPropertyMapping[] { };
         public abstract string ListName { get; }
-
-        private readonly SPFieldToPropertyMapper ListItemFieldMapper;
-        private readonly FieldToEntityPropertyMapping[] DefaultFieldMappings = new FieldToEntityPropertyMapping[]
+        
+        private readonly FieldToPropertyMapping[] DefaultFieldMappings = new FieldToPropertyMapping[]
         {
-            new FieldToEntityPropertyMapping("ID", true),
-            new FieldToEntityPropertyMapping("GUID", true),
-            new FieldToEntityPropertyMapping("Author", true),
-            new FieldToEntityPropertyMapping("Editor", true),
-            new FieldToEntityPropertyMapping("Modified", true),
-            new FieldToEntityPropertyMapping("Created", true),
-            new FieldToEntityPropertyMapping("FileLeafRef", true)
+            new FieldToPropertyMapping("ID", true),
+            new FieldToPropertyMapping("GUID", true),
+            new FieldToPropertyMapping("Author", true),
+            new FieldToPropertyMapping("Editor", true),
+            new FieldToPropertyMapping("Modified", true),
+            new FieldToPropertyMapping("Created", true),
+            new FieldToPropertyMapping("FileLeafRef", true)
         };
         
         public BaseSharePointRepository()
@@ -54,7 +53,7 @@ namespace SP2016.Repository
                 .Union(DefaultFieldMappings)
                 .ToArray();
 
-            ListItemFieldMapper = new SPFieldToPropertyMapper(allFieldMappings);
+            SPMappersFactory = new SPMappersFactory<TEntity>(allFieldMappings);
         }
 
         #region Getting all entities without filtering
@@ -138,40 +137,6 @@ namespace SP2016.Repository
         #endregion
 
         /// <summary>
-        /// Получение элемента списка
-        /// </summary>
-        /// <param name="caml">Caml запрос для получения сущности</param>
-        /// <param name="web">Web which contains the list</param>
-        /// <returns>Сущность с заполненными свойствами</returns>
-        /// <remarks>Если caml запрос вернет несколько сущностей, будет взята первая из них</remarks>
-        public TEntity GetEntity(SPWeb web, string caml)
-        {
-            TEntity entity = default(TEntity);
-
-            var query = new SPQuery
-            {
-                Query = caml
-            };
-
-            SPListItem item = null;
-            SPListItemCollection collection = null;
-
-            collection = web.Lists[ListName].GetItems(query);
-
-            if (collection != null && collection.Count > 0)
-            {
-                item = collection[0];
-            }
-
-            if (item != null)
-            {
-                entity = CreateEntity(web, item);
-            }
-
-            return entity;
-        }
-
-        /// <summary>
         /// Получить сущности из папки
         /// </summary>
         /// <param name="web">Web which contains the list</param>
@@ -202,12 +167,7 @@ namespace SP2016.Repository
         /// <returns>Сущности</returns>
         public TEntity[] GetEntities(SPWeb web, Query query, uint rowLimit = 0)
         {
-            var camlBuilder = new RepositoryCamlBuilder<TEntity>
-            {
-                FieldCollection = web.Lists[ListName].Fields,
-                ListItemFieldMapper = ListItemFieldMapper
-            };
-
+            var camlBuilder = new SimpleCamlBuilder();
             string caml = camlBuilder.BuildCaml(query);
             return GetEntities(web, caml, query.Recursive, rowLimit);
         }
@@ -233,7 +193,6 @@ namespace SP2016.Repository
         /// <summary>
         /// Получение коллекции сущностей
         /// </summary>
-        /// <param name="web">Web which contains the list</param>
         /// <param name="query">Объект SPQuery, содержащий запрос</param>
         /// <returns>Все сущности, удовлетворяющие запросу</returns>
         public TEntity[] GetEntities(SPWeb web, SPQuery query)
@@ -261,9 +220,11 @@ namespace SP2016.Repository
             TEntity entity = new TEntity();
             Type entityType = typeof(TEntity);
 
-            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, entityType, spListItem);
-            entity.ListItem = spListItem;
+            SPMappersFactory
+                .SPListItemMapper
+                .Map(web, entity, spListItem);
 
+            entity.ListItem = spListItem;
             return entity;
         }
 
@@ -284,7 +245,9 @@ namespace SP2016.Repository
             TEntity entity = new TEntity();
             Type entityType = typeof(TEntity);
 
-            ListItemFieldMapper.FillEntityFromAfterProperties(web, entity, entityType, properties);
+            SPMappersFactory
+                .SPAfterPropertiesMapper
+                .Map(web, entity, properties);
             entity.ListItem = properties.ListItem;
             return entity;
         }
@@ -295,13 +258,16 @@ namespace SP2016.Repository
         /// <param name="web">Web which contains the list</param>
         /// <param name="item">Элемент списка</param>
         /// <returns>Сущность с заполненными свойствами</returns>
-        public virtual TEntity CreateEntity(SPWeb web, SPListItemVersion spListItem)
+        public virtual TEntity CreateEntity(SPWeb web, SPListItemVersion spListItemVersion)
         {
             TEntity entity = new TEntity();
             Type entityType = typeof(TEntity);
 
-            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, entityType, spListItem);
-            entity.ListItem = spListItem.ListItem;
+            SPMappersFactory
+                .SPListItemVersionMapper
+                .Map(web, entity, spListItemVersion);
+
+            entity.ListItem = spListItemVersion.ListItem;
             return entity;
         }
 
@@ -472,7 +438,9 @@ namespace SP2016.Repository
             var newItem = web.Lists[ListName].Items.Add();
             UpdateListItemInternal(web, entity, newItem);
 
-            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, typeof(TEntity), newItem);
+            SPMappersFactory
+                .SPListItemMapper
+                .Map(web, entity, newItem);
 
             entity.ListItem = newItem;
         }
@@ -551,7 +519,9 @@ namespace SP2016.Repository
 
             SPListItem newItem = list.Items.Add(url, SPFileSystemObjectType.File, null);
             UpdateListItemInternal(web, entity, newItem);
-            ListItemFieldMapper.FillEntityFromSPListItem(web, entity, typeof(TEntity), newItem);
+            SPMappersFactory
+                .SPListItemMapper
+                .Map(web, entity, newItem);
         }
 
         /// <summary>
@@ -612,7 +582,7 @@ namespace SP2016.Repository
         public void AddBatch(SPWeb web, TEntity[] entities, int blocksize = 1000, Action<int> batchFinishedFunc = null)
         {
             string command = "<Method ID=\"{0}\"><SetList>{1}</SetList><SetVar Name=\"ID\">New</SetVar><SetVar Name=\"Cmd\">Save</SetVar>{3}</Method>";
-            BatchUtil.ProcessBatch(entities, web, ListName, ListItemFieldMapper, command, blocksize);
+            BatchUtil.ProcessBatch(entities, web, ListName, SPMappersFactory.SPBatchMapper, command, blocksize);
         }
 
         /// <summary>
@@ -648,9 +618,10 @@ namespace SP2016.Repository
 
             Func<int, string> methodExtractor = index =>
             {
-                string fields = ListItemFieldMapper.GenerateBatchCommandFromEntity(web, list, typeof(TEntity), entitiesWithFolderPath[index].Entity);
+                StringBuilder fields = new StringBuilder();
+                SPMappersFactory.SPBatchMapper.Map(web, list, fields, entitiesWithFolderPath[index].Entity);
                 string folderServerRelativeUrl = SPUtility.ConcatUrls(list.RootFolder.ServerRelativeUrl, entitiesWithFolderPath[index].FolderPath);
-                return string.Format(command, index, list.ID, folderServerRelativeUrl, fields);
+                return string.Format(command, index, list.ID, folderServerRelativeUrl, fields.ToString());
             };
 
             BatchUtil.ProcessBatch(entitiesWithFolderPath.Length, methodExtractor, web, blocksize, batchFinishedFunc);
@@ -715,7 +686,7 @@ namespace SP2016.Repository
         public void DeleteBatch(TEntity[] entities, SPWeb web, int blocksize = 1000, Action<int> batchFinishedFunc = null)
         {
             string command = "<Method><SetList Scope=\"Request\">{1}</SetList><SetVar Name=\"ID\">{2}</SetVar><SetVar Name=\"Cmd\">Delete</SetVar></Method>";
-            BatchUtil.ProcessBatch(entities, web, ListName, ListItemFieldMapper, command, blocksize);
+            BatchUtil.ProcessBatch(entities, web, ListName, SPMappersFactory.SPBatchMapper, command, blocksize);
         }
 
         /// <summary>
@@ -901,7 +872,9 @@ namespace SP2016.Repository
         {
             try
             {
-                ListItemFieldMapper.FillAfterPropertiesFromEntity(web, properties, typeof(TEntity), entity);
+                SPMappersFactory
+                    .SPAfterPropertiesMapper
+                    .Map(web, properties, entity);
             }
             catch (Exception ex)
             {
@@ -930,7 +903,10 @@ namespace SP2016.Repository
 
         protected void UpdateListItemInternal(SPWeb web, TEntity entity, SPListItem listItem, bool trackChanges = true)
         {
-            this.ListItemFieldMapper.FillSPListItemFromEntity(web, listItem, typeof(TEntity), entity);
+            SPMappersFactory
+                .SPListItemMapper
+                .Map(web, listItem, entity);
+
             using (new AllowUnsafeUpdates(web))
             {
                 if (trackChanges)
@@ -950,7 +926,7 @@ namespace SP2016.Repository
         public void UpdateBatch(TEntity[] entities, SPWeb web, int blocksize = 1000)
         {
             string command = "<Method ID=\"{0}\"><SetList>{1}</SetList><SetVar Name=\"ID\">{2}</SetVar><SetVar Name=\"Cmd\">Save</SetVar>{3}</Method>";
-            BatchUtil.ProcessBatch(entities, web, ListName, ListItemFieldMapper, command, blocksize);
+            BatchUtil.ProcessBatch(entities, web, ListName, SPMappersFactory.SPBatchMapper, command, blocksize);
         }
 
         /// <summary>
@@ -1494,25 +1470,11 @@ namespace SP2016.Repository
         }
 
         /// <summary>
-        /// Получение поля по имени свойства
+        /// Create folder
         /// </summary>
-        /// <param name="propertyName">Название свойства сущности</param>
-        /// <returns>Поле списка, соответствующее свойству сущности</returns>
-        public SPField GetField(SPWeb web, string propertyName)
-        {
-            try
-            {
-                string fieldName = ListItemFieldMapper.GetFieldDisplayName(propertyName);
-                SPList list = GetList(web);
-                return list.Fields.GetField(fieldName);
-            }
-            catch (Exception ex)
-            {
-                InvalidOperationException exception = new InvalidOperationException(string.Format("Ошибка при получении поля, соответствующего свойству {0}", propertyName), ex);
-                throw exception;
-            }
-        }
-
+        /// <param name="web">SharePoint Web</param>
+        /// <param name="folderRelativeUrl">folder url </param>
+        /// <returns></returns>
         private SPFolder CreateFolder(SPWeb web, string folderRelativeUrl)
         {
             SPList list = GetList(web);
@@ -1538,31 +1500,6 @@ namespace SP2016.Repository
             return item != null;
         }
 
-        /// <summary>
-        /// Проверка существования необходимых полей
-        /// </summary>
-        /// <param name="item">Элемент, существование полей в котором необходимо проверить</param>
-        public void CheckExistsFields(SPListItem item)
-        {
-            List<string> missingFields = new List<string>();
-
-            foreach (var mapping in ListItemFieldMapper.Mappings)
-            {
-                if (!item.Fields.ContainsField(mapping.FieldName))
-                    missingFields.Add(mapping.FieldName);
-            }
-
-            if (missingFields.Count > 0)
-            {
-                ArgumentException ex = new ArgumentException(
-                    string.Format(
-                    CultureInfo.CurrentCulture,
-                    "Следующие поля отсутствуют: {0}",
-                    string.Join(", ", missingFields.ToArray())));
-                throw ex;
-            }
-        }
-
         public bool FolderExists(SPWeb web, string url)
         {
             try
@@ -1575,6 +1512,12 @@ namespace SP2016.Repository
             }
             catch (ArgumentException) { return false; }
             catch (Exception) { return false; }
+        }
+
+        //TODO :: remove
+        public TEntity[] GetEntities(SPWeb context, object expr, uint rowLimit)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.SharePoint.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SP2016.Repository.Tests.Repository
 {
@@ -10,10 +11,15 @@ namespace SP2016.Repository.Tests.Repository
         {
             Perform(web =>
             {
-                const string expectedUrl = "/training/Lists/Users/AllItems.aspx";
-                var actualUrl = UsersRepository.GetDefaultViewUrl(web);
+                string webServerRelativeUrl = web.ServerRelativeUrl;
 
-                Assert.AreEqual(expectedUrl, actualUrl);
+                string viewWebRelativeUrl_expected = "Lists/Users/AllItems.aspx";
+                string viewServerRelativeUrl_expected = 
+                    SPUtility.ConcatUrls(webServerRelativeUrl, viewWebRelativeUrl_expected);
+
+                var viewServerRelativeUrl_actual = UsersRepository.GetDefaultViewUrl(web);
+
+                Assert.AreEqual(viewServerRelativeUrl_expected, viewServerRelativeUrl_actual);
             });
         }
 
@@ -27,11 +33,15 @@ namespace SP2016.Repository.Tests.Repository
                     var user = MockUsers.User1;
                     UsersRepository.Add(web, user);
 
-                    var expectedUrl = $"/training/Lists/Users/DispForm.aspx?ID={user.ID}";
+                    string webServerRelativeUrl = web.ServerRelativeUrl;
+                    string dispFormWebRelativeUrl_expected = $"Lists/Users/DispForm.aspx?ID={user.ID}";
 
-                    var actualUrl = UsersRepository.GetDisplayFormUrl(web, user.ID);
+                    var dispFormServerRelativeUrl_expected = 
+                        SPUtility.ConcatUrls(webServerRelativeUrl, dispFormWebRelativeUrl_expected);
 
-                    Assert.AreEqual(expectedUrl, actualUrl);
+                    var dispFormServerRelativeUrl_actual = UsersRepository.GetDisplayFormUrl(web, user.ID);
+
+                    Assert.AreEqual(dispFormServerRelativeUrl_expected, dispFormServerRelativeUrl_actual);
                 }
                 finally
                 {

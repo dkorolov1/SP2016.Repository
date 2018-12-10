@@ -6,10 +6,10 @@ namespace SP2016.Repository.Tests
     {
         public override string ListName => "Departments";
 
-        protected override FieldToEntityPropertyMapping[] FieldMappings => new FieldToEntityPropertyMapping[]
+        protected override FieldToPropertyMapping[] FieldMappings => new FieldToPropertyMapping[]
         {
-            new FieldToEntityPropertyMapping("Title"),
-            new FieldToEntityPropertyMapping("EmployeesCount")
+            new FieldToPropertyMapping("Title"),
+            new FieldToPropertyMapping("EmployeesCount")
         };
     }
 }
