@@ -2,7 +2,7 @@
 
 namespace SP2016.Repository.Converters.Common
 {
-    public class BooleanConverter : SimpleConverter
+    public class BooleanConverter : FieldConverter
     {
         public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {

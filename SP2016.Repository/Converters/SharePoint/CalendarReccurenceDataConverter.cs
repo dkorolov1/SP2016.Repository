@@ -7,15 +7,15 @@ using System.Xml.Serialization;
 
 namespace SP2016.Repository.Converters.SharePoint
 {
-    public class CalendarReccurenceDataConverter : SharePointConverter
+    public class CalendarReccurenceDataConverter : SPFieldConverter
     {
-        public override object ConvertPropertyValueToFieldValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object propertyValue)
+        public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {
             ReccurenceDataConverter converter = new ReccurenceDataConverter();
             return converter.Convert(propertyValue as CalendarReccurenceData);
         }
 
-        public override object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
+        public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(CalendarReccurenceData), string.Empty);
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();

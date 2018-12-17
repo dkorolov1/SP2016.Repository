@@ -3,14 +3,14 @@ using System.Reflection;
 
 namespace SP2016.Repository.Converters.SharePoint
 {
-    public class SPFieldCalculatedValueConverter : SharePointConverter
+    public class SPFieldCalculatedValueConverter : SPFieldConverter
     {
-        public override object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
+        public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
-            return new SPFieldCalculatedValue((field as SPFieldCalculated).TypeAsString, field.GetFieldValueAsText(fieldValue));
+            return new SPFieldCalculatedValue((Field as SPFieldCalculated).TypeAsString, Field.GetFieldValueAsText(fieldValue));
         }
 
-        public override object ConvertPropertyValueToFieldValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object propertyValue)
+        public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {
             return (propertyValue as SPFieldCalculatedValue).ToString();
         }

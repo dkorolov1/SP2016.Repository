@@ -3,9 +3,9 @@ using System.Reflection;
 
 namespace SP2016.Repository.Converters.SharePoint
 {
-    public class SPContentTypeIdValueConverter : SharePointConverter
+    public class SPContentTypeIdValueConverter : SPFieldConverter
     {
-        public override object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
+        public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
             return new SPContentTypeId(fieldValue.ToString());
         }

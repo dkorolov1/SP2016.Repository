@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-namespace SP2016.Repository.Converters.Common
+namespace SP2016.Repository.Converters
 {
-    public class SimpleConverter : IConverter
+    public class FieldConverter
     {
         /// <summary>
         /// Конвертируем значение свойства в значение поля

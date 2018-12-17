@@ -1,18 +1,16 @@
 ﻿using Microsoft.SharePoint;
 using SP2016.Repository.Entities;
-using SP2016.Repository.Utils;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace SP2016.Repository.Mapping.SharePoint
 {
-    public class SPListItemMapper<TEntity> : SPFieldMapper<TEntity> where TEntity : BaseEntity
+    public class SPListItemMapper<TEntity> : SPFieldMapper<TEntity> where TEntity : BaseSPEntity
     {
         public SPListItemMapper(IEnumerable<FieldToPropertyMapping> mappings) 
             : base(mappings) { }
 
-        public void Map(SPWeb web, SPListItem to, BaseEntity from)
+        public void Map(SPWeb web, SPListItem to, BaseSPEntity from)
         {
             var fieldMappingsToFieldValues = FieldMappingsToFieldValues(web, to.ParentList, from);
 
@@ -39,12 +37,10 @@ namespace SP2016.Repository.Mapping.SharePoint
         {
             var fieldMappingsToPropertyValues = FieldMappingsToPropertyValues(web, from.ParentList, from);
 
-            foreach (var fieldMappingsToPropertyValue in fieldMappingsToPropertyValues)
+            foreach (var fieldMappingToPropertyValue in fieldMappingsToPropertyValues)
             {
-                (FieldToPropertyMapping fieldMapping, object propertyValue) = fieldMappingsToPropertyValue;
-
-                PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(from, typeof(TEntity), fieldMapping);
-                propertyInfo.SetValue(to, propertyValue);
+                (FieldToPropertyMapping fieldMapping, object propertyValue) = fieldMappingToPropertyValue;
+                fieldMapping.PropertyInfo.SetValue(to, propertyValue);
             }
         }
     }

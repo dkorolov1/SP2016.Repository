@@ -3,19 +3,19 @@ using Microsoft.SharePoint;
 
 namespace SP2016.Repository.Converters.SharePoint
 {
-    public class SPPrincipalConverter : SharePointConverter
+    public class SPPrincipalConverter : SPFieldConverter
     {
-        public override object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
+        public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
-            var userValue = new SPFieldUserValue(web, fieldValue.ToString());
-            var principal = userValue.User ?? (SPPrincipal)web.SiteGroups.GetByID(userValue.LookupId);
+            var userValue = new SPFieldUserValue(Web, fieldValue.ToString());
+            var principal = userValue.User ?? (SPPrincipal)Web.SiteGroups.GetByID(userValue.LookupId);
             return principal;
         }
 
-        public override object ConvertPropertyValueToFieldValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object propertyValue)
+        public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {
             var principal = (SPPrincipal)propertyValue;
-            return new SPFieldUserValue(web, principal.ID, principal.Name);
+            return new SPFieldUserValue(Web, principal.ID, principal.Name);
         }
     }
 }

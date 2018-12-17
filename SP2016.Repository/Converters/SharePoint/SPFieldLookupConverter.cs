@@ -1,11 +1,12 @@
 ﻿using Microsoft.SharePoint;
+using System;
 using System.Reflection;
 
 namespace SP2016.Repository.Converters.SharePoint
 {
-    public class SPFieldLookupConverter : SharePointConverter
+    public class SPFieldLookupConverter : SPFieldConverter
     {
-        public override object ConvertPropertyValueToFieldValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object propertyValue)
+        public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {
             // Обработка ошибки,возникающей в случае, когда значение типа SPFieldLookupValue имеет LookupId = 0                    
             if (propertyValue is SPFieldLookupValue)
@@ -17,12 +18,14 @@ namespace SP2016.Repository.Converters.SharePoint
 
             return propertyValue;
         }
-        public override object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
+
+        public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
-            string valueStr = fieldValue.ToString();
+            string valueStr = Convert.ToString(fieldValue);
             if (propertyInfo.PropertyType.Equals(typeof(string)))
                 return valueStr;
-            else if ((field as SPFieldLookup).AllowMultipleValues)
+
+            if ((Field as SPFieldLookup).AllowMultipleValues)
                 return new SPFieldLookupValueCollection(valueStr);
             else
                 return new SPFieldLookupValue(valueStr);

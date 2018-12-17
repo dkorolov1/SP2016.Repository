@@ -11,7 +11,7 @@ namespace SP2016.Repository.Utils
 {
     public static class BatchUtil
     {
-        public static void ProcessBatch<TEntity>(TEntity[] entities, SPWeb web, string listName, SPBatchMapper<TEntity> spBatchMapper, string commandFormat, int blocksize) where TEntity : BaseEntity
+        public static void ProcessBatch<TEntity>(TEntity[] entities, SPWeb web, string listName, SPBatchMapper<TEntity> spBatchMapper, string commandFormat, int blocksize) where TEntity : BaseSPEntity
         {
             if (blocksize < 1)
                 throw new ArgumentOutOfRangeException("blocksize", "Размер блока должен быть натуральным числом");

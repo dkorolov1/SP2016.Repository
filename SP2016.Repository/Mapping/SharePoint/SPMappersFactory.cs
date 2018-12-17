@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SP2016.Repository.Mapping
 {
-    public class SPMappersFactory<TEntity> where TEntity : BaseEntity
+    public class SPMappersFactory<TEntity> where TEntity : BaseSPEntity
     {
         private readonly IReadOnlyCollection<FieldToPropertyMapping> fieldMappings;
 

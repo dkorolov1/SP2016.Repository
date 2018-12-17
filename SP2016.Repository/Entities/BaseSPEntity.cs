@@ -1,4 +1,5 @@
 ﻿using Microsoft.SharePoint;
+using SP2016.Repository.Attributes;
 using System;
 using System.Runtime.Serialization;
 
@@ -7,56 +8,61 @@ namespace SP2016.Repository.Entities
     /// <summary>
     /// Базовый класс для всех сущностей
     /// </summary>
-    public class BaseEntity : IEntity
+    public class BaseSPEntity : IEntity
     {
         /// <summary>
         /// Идентификатор элемента
         /// </summary>
+        [FieldMappingAttribute("ID", true)]
         public int ID { get; set; }
 
         /// <summary>
         /// Идентификатор сущности
         /// </summary>
+        [FieldMappingAttribute("GUID", true)]
         public Guid GUID { get; set; }
 
         /// <summary>
         /// Кем создано
         /// </summary>
+        [FieldMappingAttribute("Author", true)]
         public SPFieldUserValue Author { get; set; }
 
         /// <summary>
         /// Кем изменено
         /// </summary>
+        [FieldMappingAttribute("Editor", true)]
         public SPFieldUserValue Editor { get; set; }
 
         /// <summary>
         /// Дата изменения
         /// </summary>
+        [FieldMappingAttribute("Modified", true)]
         public DateTime Modified { get; set; }
 
         /// <summary>
         /// Дата создания
         /// </summary>
+        [FieldMappingAttribute("Created", true)]
         public DateTime Created { get; set; }
 
         /// <summary>
         /// Имя файла библиотеки документов, связанной с текущей сущностью
         /// </summary>
+        [FieldMappingAttribute("FileLeafRef", true)]
         public string FileLeafRef { get; set; }
 
         /// <summary>
         /// Элемент списка. Использовать при крайней необходимости.
         /// </summary>
-        [IgnoreDataMember]
         public SPListItem ListItem { get; set; }
 
         /// <summary>
         /// Тип контента для установки
         /// </summary>
-        [IgnoreDataMember]
         private SPContentType SPContentType { get; set; }
 
-        #region readonly fields
+        #region calculated fields
 
         /// <summary>
         /// Тип содержимого

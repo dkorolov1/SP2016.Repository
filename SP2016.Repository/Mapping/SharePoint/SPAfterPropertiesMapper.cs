@@ -1,28 +1,20 @@
 ﻿using Microsoft.SharePoint;
-using SP2016.Repository.Converters;
 using SP2016.Repository.Converters.SharePoint;
 using SP2016.Repository.Entities;
-using SP2016.Repository.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace SP2016.Repository.Mapping.SharePoint
 {
-    public class SPAfterPropertiesMapper<TEntity> : SPFieldMapper<TEntity> where TEntity : BaseEntity
+    public class SPAfterPropertiesMapper<TEntity> : SPFieldMapper<TEntity> where TEntity : BaseSPEntity
     {
         public SPAfterPropertiesMapper(IEnumerable<FieldToPropertyMapping> mappings)
             : base(mappings)
         {
-            var afterPropertiesMapper = new (Type, IConverter)[] {
-                (typeof(DateTime), new XmlDateTimeFieldValueConverter()),
-                (typeof(SPContentTypeId), new SPContentTypeIdValueConverter()),
-                (typeof(SPFieldUserValueCollection), new SPFieldUserValueCollectionConverter())
-            };
-
-            RegisterUniqueConverters(afterPropertiesMapper);
+            RegisterConverters(
+                (typeof(DateTime), new XmlDateTimeFieldValueConverter()));
         }
 
         /// <summary>
@@ -31,27 +23,32 @@ namespace SP2016.Repository.Mapping.SharePoint
         /// <param name="web"></param>
         /// <param name="entity">Map to entity</param>
         /// <param name="properties">Map from properties</param>
-        public void Map(SPWeb web, BaseEntity entity, SPItemEventProperties properties)
+        public void Map(SPWeb web, BaseSPEntity entity, SPItemEventProperties properties)
         {
             SPList list = properties.List;
 
             foreach (FieldToPropertyMapping fieldMapping in FieldMappings)
             {
-                PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(typeof(TEntity), fieldMapping);
                 SPField field = list.Fields.GetField(fieldMapping.FieldName);
                 object fieldValue;
+                bool hasProperty = properties.AfterProperties
+                    .Cast<DictionaryEntry>()
+                    .Any(e => e.Key.Equals(field.InternalName));
 
-                if (properties.AfterProperties.Cast<DictionaryEntry>().Any(e => e.Key.Equals(field.InternalName)))
+                if (hasProperty)
                 {
-                    fieldValue = properties.AfterProperties[field.InternalName];
+                    fieldValue = properties
+                        .AfterProperties[field.InternalName];
                 }
                 else
                 {
-                    fieldValue = properties.ListItem ?? properties.ListItem[fieldMapping.FieldName];
+                    fieldValue = properties.ListItem 
+                        ?? properties.ListItem[fieldMapping.FieldName];
                 }
+                
+                var propertyValue = ToPropertyValue(web, field, fieldMapping, fieldValue);
 
-                var propertyValue = ConvertFieldValueToPropertyValue(web, field, propertyInfo, fieldValue);
-                propertyInfo.SetValue(entity, propertyValue);
+                fieldMapping.PropertyInfo.SetValue(entity, propertyValue);
             }
         }
 
@@ -61,7 +58,7 @@ namespace SP2016.Repository.Mapping.SharePoint
         /// <param name="web"></param>
         /// <param name="properties">Map to properties</param>
         /// <param name="entity">Map from entity</param>
-        public void Map(SPWeb web, SPItemEventProperties properties, BaseEntity entity)
+        public void Map(SPWeb web, SPItemEventProperties properties, BaseSPEntity entity)
         {
             var fieldMappingsToFieldValues = FieldMappingsToFieldValues(web, properties.List, entity);
 

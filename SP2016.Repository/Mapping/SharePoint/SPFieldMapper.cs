@@ -1,22 +1,19 @@
 ﻿using Microsoft.SharePoint;
 using SP2016.Repository.Converters;
-using SP2016.Repository.Converters.Common;
 using SP2016.Repository.Converters.SharePoint;
 using SP2016.Repository.Entities;
 using SP2016.Repository.Models;
-using SP2016.Repository.Utils;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace SP2016.Repository.Mapping.SharePoint
 {
-    public abstract class SPFieldMapper<TEntity> : FieldMapper where TEntity : BaseEntity
+    public abstract class SPFieldMapper<TEntity> : FieldMapper where TEntity : BaseSPEntity
     {
         public SPFieldMapper(IEnumerable<FieldToPropertyMapping> mappings) 
             : base(mappings)
         {
-            var spConverters = new (Type, IConverter)[] {
+            var spConverters = new (Type, FieldConverter)[] {
                 (typeof(SPPrincipal), new SPPrincipalConverter()),
                 (typeof(SPUser), new SPPrincipalConverter()),
                 (typeof(SPGroup), new SPPrincipalConverter()),
@@ -29,88 +26,72 @@ namespace SP2016.Repository.Mapping.SharePoint
                 (typeof(SPFieldUserValueCollection) , new SPFieldUserConverter()),
                 (typeof(CalendarReccurenceData), new CalendarReccurenceDataConverter()),
                 (typeof(SPFieldCalculatedValue), new SPFieldCalculatedValueConverter()),
-                (typeof(SPContentType), new SPContentTypeValueConverter())
+                (typeof(SPContentType), new SPContentTypeValueConverter()),
+                (typeof(SPContentTypeId), new SPContentTypeIdValueConverter()),
+                (typeof(SPFieldUserValueCollection), new SPFieldUserValueCollectionConverter())
             };
 
-            RegisterUniqueConverters(spConverters);
+            RegisterConverters(spConverters);
         }
 
-        protected IEnumerable<(FieldToPropertyMapping, object)> FieldMappingsToFieldValues(SPWeb web, SPList list, BaseEntity entity)
+        protected virtual FieldConverter GetConverter(SPWeb web, SPField field, FieldToPropertyMapping mapping)
         {
-            foreach (var mapping in FieldMappings)
+            FieldConverter converter = GetConverter(mapping);
+            if (converter is SPFieldConverter spConverter)
             {
-                if (!mapping.ReadOnly)
+                spConverter.Web = web;
+                spConverter.Field = field;
+
+                return spConverter;
+            }
+            return converter;
+        }
+
+        protected object ToFieldValue(SPWeb web, SPField field, FieldToPropertyMapping mapping, object propertyValue)
+        {
+            var converter = GetConverter(web, field, mapping);
+            return converter
+                    .ConvertPropertyValueToFieldValue(mapping.PropertyInfo, propertyValue);
+        }
+
+        protected object ToPropertyValue(SPWeb web, SPField field, FieldToPropertyMapping mapping, object fieldValue)
+        {
+            var converter = GetConverter(web, field, mapping);
+            return converter
+                    .ConvertFieldValueToPropertyValue(mapping.PropertyInfo, fieldValue);
+        }
+
+        protected IEnumerable<(FieldToPropertyMapping, object)> FieldMappingsToFieldValues(SPWeb web, SPList list, BaseSPEntity entity)
+        {
+            foreach (var fieldMapping in FieldMappings)
+            {
+                if (!fieldMapping.ReadOnly)
                 {
-                    PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(typeof(TEntity), mapping);
-                    SPField field = list.Fields.GetFieldByInternalName(mapping.FieldName);
+                    SPField field = list.Fields
+                        .GetFieldByInternalName(fieldMapping.FieldName);
 
-                    object propertyValue = propertyInfo.GetValue(entity);
-                    object fieldValue = ConvertPropertyValueToFieldValue(web, field, propertyInfo, propertyValue);
+                    object propertyValue = fieldMapping
+                        .PropertyInfo.GetValue(entity);
 
-                    yield return (mapping, fieldValue);
+                    object fieldValue = ToFieldValue(web, field, fieldMapping, propertyValue);
+
+                    yield return (fieldMapping, fieldValue);
                 }
             }
         }
 
         protected IEnumerable<(FieldToPropertyMapping, object)> FieldMappingsToPropertyValues(SPWeb web, SPList list, SPListItem item)
         {
-            foreach (FieldToPropertyMapping fieldMapping in FieldMappings)
+            foreach (var fieldMapping in FieldMappings)
             {
-                PropertyInfo propertyInfo = ReflectionUtil.GetPropertyInfo(typeof(TEntity), fieldMapping);
-                SPField field = item.Fields.GetField(fieldMapping.FieldName);
+                SPField field = item.Fields
+                    .GetFieldByInternalName(fieldMapping.FieldName);
 
                 var fieldValue = item[fieldMapping.FieldName];
-                var propertyValue = ConvertFieldValueToPropertyValue(web, field, propertyInfo, fieldValue);
+
+                var propertyValue = ToPropertyValue(web, field, fieldMapping, fieldValue);
 
                 yield return (fieldMapping, propertyValue);
-            }
-        }
-
-        protected object ConvertPropertyValueToFieldValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object propertyValue)
-        {
-            if (propertyValue is null)
-                return null;
-
-            var converter = GetConverter(propertyInfo);
-
-            switch (converter)
-            {
-                case SharePointConverter spConverter:
-                    {
-                        return spConverter
-                            .ConvertPropertyValueToFieldValue(web, field, propertyInfo, propertyValue);
-                    }
-                case SimpleConverter simpleConverter:
-                    {
-                        return simpleConverter
-                            .ConvertPropertyValueToFieldValue(propertyInfo, propertyValue);
-                    }
-                default:
-                    return null;
-            }
-        }
-
-        protected object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
-        {
-            if (fieldValue is null)
-                return null;
-
-            var converter = GetConverter(propertyInfo);
-
-            switch (converter)
-            {
-                case SharePointConverter spConverter:
-                    {
-                        return spConverter
-                            .ConvertFieldValueToPropertyValue(web, field, propertyInfo, fieldValue);
-                    }
-                case SimpleConverter simpleConverter:
-                    {
-                        return simpleConverter
-                            .ConvertFieldValueToPropertyValue(propertyInfo, fieldValue);
-                    }
-                default:
-                    return null;
             }
         }
     }

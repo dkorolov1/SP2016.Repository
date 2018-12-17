@@ -56,13 +56,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Converters\SharePoint\SharePointConverter.cs" />
+    <Compile Include="Converters\SPFieldConverter.cs" />
     <Compile Include="Batch\ResultEntry.cs" />
     <Compile Include="Batch\Results.cs" />
     <Compile Include="Batch\SetFieldValue.cs" />
     <Compile Include="Converters\SharePoint\BatchStringValueConverter.cs" />
     <Compile Include="Converters\SharePoint\CalendarReccurenceDataConverter.cs" />
-    <Compile Include="Converters\IConverter.cs" />
     <Compile Include="Converters\SharePoint\ItemVersionDateTimeConverter.cs" />
     <Compile Include="Converters\SharePoint\SPContentTypeIdValueConverter.cs" />
     <Compile Include="Converters\SharePoint\SPContentTypeValueConverter.cs" />
@@ -75,7 +74,7 @@
     <Compile Include="Converters\SharePoint\SPPrincipalConverter.cs" />
     <Compile Include="Converters\SharePoint\SPPrincipalInfoConverter.cs" />
     <Compile Include="Converters\SharePoint\XmlDateTimeFieldValueConverter.cs" />
-    <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="Entities\BaseSPEntity.cs" />
     <Compile Include="FieldToEntityPropertyMappingComparer.cs" />
     <Compile Include="Mapping\SharePoint\SPAfterPropertiesMapper.cs" />
     <Compile Include="Mapping\SharePoint\SPMappersFactory.cs" />
@@ -84,12 +83,10 @@
     <Compile Include="Mapping\SharePoint\SPListItemMapper.cs" />
     <Compile Include="Mapping\SharePoint\SPListItemVersionMapper.cs" />
     <Compile Include="Models\EntityContainer.cs" />
-    <Compile Include="ISharePointRepository.cs" />
     <Compile Include="Utils\AllowUnsafeUpdates.cs" />
     <Compile Include="Utils\BatchUtil.cs" />
-    <Compile Include="Utils\ItemFieldsChecking.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BaseSharePointRepository.cs" />
+    <Compile Include="SharePointRepository.cs" />
     <Compile Include="Caml\CamlFilter.cs" />
     <Compile Include="Caml\CamlQueryBuilder.cs" />
     <Compile Include="Caml\RepositoryCamlBuilder.cs" />
@@ -114,8 +111,7 @@
     <Compile Include="Caml\SiteQueryWebScopes.cs" />
     <Compile Include="Caml\SortOrder.cs" />
     <Compile Include="Constants\Constants.cs" />
-    <Compile Include="Utils\CustomizedComparer.cs" />
-    <Compile Include="Converters\Common\SimpleConverter.cs" />
+    <Compile Include="Converters\FieldConverter.cs" />
     <Compile Include="Converters\Common\BooleanConverter.cs" />
     <Compile Include="Converters\Common\DateTimeConverter.cs" />
     <Compile Include="Converters\Common\DoubleConverter.cs" />
@@ -125,11 +121,10 @@
     <Compile Include="Converters\Common\SingleConverter.cs" />
     <Compile Include="Converters\Common\StringValueConverter.cs" />
     <Compile Include="Attributes\FieldMappingAttribute.cs" />
-    <Compile Include="IRepository.cs" />
+    <Compile Include="Repository.cs" />
     <Compile Include="Mapping\FieldMapper.cs" />
     <Compile Include="Mapping\FieldToPropertyMapping.cs" />
     <Compile Include="Entities\IEntity.cs" />
-    <Compile Include="Utils\ReflectionUtil.cs" />
     <Compile Include="Logging\ILog.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Constants\SPConstants.cs" />
