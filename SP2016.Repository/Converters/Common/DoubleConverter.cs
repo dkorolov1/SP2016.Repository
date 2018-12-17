@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace SP2016.Repository.Converters.Common
 {
-    public class DoubleConverter : SimpleConverter
+    public class DoubleConverter : FieldConverter
     {
         public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {

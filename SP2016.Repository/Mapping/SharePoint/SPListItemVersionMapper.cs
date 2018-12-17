@@ -6,13 +6,13 @@ using System.Collections.Generic;
 
 namespace SP2016.Repository.Mapping.SharePoint
 {
-    public class SPListItemVersionMapper<TEntity> : SPFieldMapper<TEntity> where TEntity : BaseEntity
+    public class SPListItemVersionMapper<TEntity> : SPFieldMapper<TEntity> where TEntity : BaseSPEntity
     {
         public SPListItemVersionMapper(IEnumerable<FieldToPropertyMapping> mappings) 
             : base(mappings)
         {
-            var itemVersionDateTimeConverter = (typeof(DateTime), new ItemVersionDateTimeConverter());
-            RegisterUniqueConverters(itemVersionDateTimeConverter);
+            RegisterConverters(
+                (typeof(DateTime), new ItemVersionDateTimeConverter()));
         }
 
         public void Map(SPWeb web, object to, SPListItemVersion from)

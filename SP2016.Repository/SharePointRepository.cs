@@ -21,39 +21,15 @@ namespace SP2016.Repository
     /// the SharePoint calls from custom code.
     /// </summary>
     /// <typeparam name="TEntity">Конкретная сущность, для которой создается репозиторий</typeparam>
-    public abstract class BaseSharePointRepository<TEntity> : ISharePointRepository<TEntity> where TEntity : BaseEntity, new()
+    public abstract class SharePointRepository<TEntity> : Repository<SPWeb, TEntity> where TEntity : BaseSPEntity, new()
     {
-        protected readonly SPMappersFactory<TEntity> SPMappersFactory;
-        protected virtual FieldToPropertyMapping[] FieldMappings => new FieldToPropertyMapping[] { };
+        protected SPMappersFactory<TEntity> SPMappersFactory { get; }
         public abstract string ListName { get; }
-        
-        private readonly FieldToPropertyMapping[] DefaultFieldMappings = new FieldToPropertyMapping[]
+
+        public SharePointRepository()
         {
-            new FieldToPropertyMapping("ID", true),
-            new FieldToPropertyMapping("GUID", true),
-            new FieldToPropertyMapping("Author", true),
-            new FieldToPropertyMapping("Editor", true),
-            new FieldToPropertyMapping("Modified", true),
-            new FieldToPropertyMapping("Created", true),
-            new FieldToPropertyMapping("FileLeafRef", true)
-        };
-        
-        public BaseSharePointRepository()
-        {
-            var intersectedMappings = FieldMappings
-                .Intersect(DefaultFieldMappings, new FieldToEntityPropertyMappingComparer())
-                .ToArray();
-
-            if (intersectedMappings.Length > 0) {
-                string intersectedMappingsFieldsStr = string.Join(",", intersectedMappings.Select(f => f.FieldName));
-                throw new ApplicationException($"You can't map default fields. ({intersectedMappingsFieldsStr})");
-            }
-
-            var allFieldMappings = FieldMappings
-                .Union(DefaultFieldMappings)
-                .ToArray();
-
-            SPMappersFactory = new SPMappersFactory<TEntity>(allFieldMappings);
+            var fieldMappings = GetFieldMappings();
+            SPMappersFactory = new SPMappersFactory<TEntity>(fieldMappings);
         }
 
         #region Getting all entities without filtering
@@ -70,7 +46,7 @@ namespace SP2016.Repository
             return (recursive) ? GetEntities(web, query.Query, recursive) : GetEntities(web, query);
         }
 
-        public TEntity[] GetAllEntities(SPWeb web)
+        public override TEntity[] GetAllEntities(SPWeb web)
         {
             return GetAllEntities(web, false);
         }
@@ -347,7 +323,7 @@ namespace SP2016.Repository
         /// <param name="id">ИД сущности</param>
         /// <param name="web">Узел, с которого необходимо получить сущность</param>
         /// <returns>Возвращает сущность или null</returns>
-        public TEntity GetEntityById(SPWeb web, int id)
+        public override TEntity GetEntityById(SPWeb web, int id)
         {
             var item = GetListItemById(web, id);
             if (null != item)
@@ -433,7 +409,7 @@ namespace SP2016.Repository
         /// </summary>
         /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для добавления</param>
-        public virtual void Add(SPWeb web, TEntity entity)
+        public override void Add(SPWeb web, TEntity entity)
         {
             var newItem = web.Lists[ListName].Items.Add();
             UpdateListItemInternal(web, entity, newItem);
@@ -748,7 +724,7 @@ namespace SP2016.Repository
         /// </summary>
         /// <param name="entity">Удаляемая сущность</param>
         /// <param name="web">Web which contains the list</param>
-        public void Delete(SPWeb web, TEntity entity)
+        public override void Delete(SPWeb web, TEntity entity)
         {
             Delete(web, entity.ID);
         }
@@ -972,7 +948,7 @@ namespace SP2016.Repository
         /// <param name="web">Web which contains the list</param>
         /// <param name="entity">Сущность для обновления</param>
         /// <param name="trackChanges">Позволить ли SharePoint отслеживать изменения</param>
-        public virtual void Update(SPWeb web, TEntity entity)
+        public override void Update(SPWeb web, TEntity entity)
         {
             try
             {

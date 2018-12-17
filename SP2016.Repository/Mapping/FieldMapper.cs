@@ -1,5 +1,4 @@
-﻿using SP2016.Repository.Attributes;
-using SP2016.Repository.Converters;
+﻿using SP2016.Repository.Converters;
 using SP2016.Repository.Converters.Common;
 using SP2016.Repository.Logging;
 using System;
@@ -12,17 +11,16 @@ namespace SP2016.Repository.Mapping
 {
     public abstract class FieldMapper
     {
-        protected readonly ILog Logger;
-        protected readonly IReadOnlyCollection<FieldToPropertyMapping> FieldMappings;
-
-        private readonly Dictionary<Type, IConverter> converters;
+        protected ILog Logger { get; }
+        protected IReadOnlyCollection<FieldToPropertyMapping> FieldMappings { get; }
+        private Dictionary<Type, FieldConverter> converters;
 
         public FieldMapper(IEnumerable<FieldToPropertyMapping> mappings)
         {
             Logger = new Logger { ApplicationName = "SP2016.Repository.Mapping.FieldMapper" };
             FieldMappings = new ReadOnlyCollection<FieldToPropertyMapping>(mappings.ToArray());
 
-            converters = new Dictionary<Type, IConverter>
+            converters = new Dictionary<Type, FieldConverter>
             {
                 [typeof(string)] = new StringValueConverter(),
                 [typeof(int)] = new Int32Converter(),
@@ -35,11 +33,11 @@ namespace SP2016.Repository.Mapping
             };
         }
 
-        protected void RegisterUniqueConverters(params (Type, IConverter)[] convertersInfo)
+        protected void RegisterConverters(params (Type, FieldConverter)[] newConverters)
         {
-            foreach (var converterInfo in convertersInfo)
+            foreach (var newConverter in newConverters)
             {
-                (Type type, IConverter converter) = converterInfo;
+                (Type type, FieldConverter converter) = newConverter;
 
                 if (converters.ContainsKey(type))
                 {
@@ -52,59 +50,31 @@ namespace SP2016.Repository.Mapping
             }
         }
 
-        private SimpleConverter TryGetConverterFromAttribute(PropertyInfo propertyInfo)
+        private FieldConverter GetConverterByPropertyType(PropertyInfo propertyInfo)
         {
-            object[] specialConverterAttributes = propertyInfo.GetCustomAttributes(typeof(FieldMappingAttribute), true);
-
-            if (specialConverterAttributes.Length == 0)
-                return null;
-
-            if (specialConverterAttributes.Length > 1)
-            {
-                string errorMessage = $@"Более одного конвертера для одного свойства {propertyInfo.Name} 
-                        класса {propertyInfo.DeclaringType.Name}";
-
-                throw new InvalidOperationException(errorMessage);
-            }
-
-            FieldMappingAttribute fieldValuesConverterAttribute = (FieldMappingAttribute)specialConverterAttributes[0];
-            if (string.IsNullOrWhiteSpace(fieldValuesConverterAttribute.FieldValuesConverterTypeName))
-                return null;
-
-            Type converterType = Type.GetType(fieldValuesConverterAttribute.FieldValuesConverterTypeName);
-            BindingFlags bindingAttr = BindingFlags.CreateInstance | BindingFlags.Public | BindingFlags.Instance;
-            var converter = Activator.CreateInstance(converterType, bindingAttr, null, null, null) as SimpleConverter;
-
-            if (converter == null)
-            {
-                string errorMessage = $@"Конвертер для свойства {propertyInfo.Name} класса 
-                            {propertyInfo.DeclaringType.Name} не указан или не реализует необходимый интерфейс";
-
-                throw new InvalidOperationException(errorMessage);
-            }
-
-            return converter;
-        }
-
-        private IConverter GetConverterByPropertyType(PropertyInfo propertyInfo)
-        {
-            var propertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
+            var propertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) 
+                ?? propertyInfo.PropertyType;
 
             if (propertyType.IsEnum)
                 propertyType = typeof(Enum);
 
-            IConverter converter = new SimpleConverter();
-
-            if (converters.ContainsKey(propertyType))
-                converter = converters[propertyType];
+            converters
+                .TryGetValue(propertyType, out FieldConverter converter);
 
             return converter;
         }
 
-        protected IConverter GetConverter(PropertyInfo propertyInfo)
+        protected FieldConverter GetConverter(FieldToPropertyMapping mapping)
         {
-            return TryGetConverterFromAttribute(propertyInfo) ??
-                GetConverterByPropertyType(propertyInfo);
+            FieldConverter converter = mapping.Converter 
+                ?? GetConverterByPropertyType(mapping.PropertyInfo);
+
+            if (converter is null)
+            {
+                converter = new FieldConverter();
+            }
+
+            return converter;
         }
     }
 }

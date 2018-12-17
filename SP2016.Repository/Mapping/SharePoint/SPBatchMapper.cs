@@ -8,29 +8,28 @@ using System.Text;
 
 namespace SP2016.Repository.Mapping.SharePoint
 {
-    public class SPBatchMapper<TEntity> : SPFieldMapper<TEntity> where TEntity : BaseEntity
+    public class SPBatchMapper<TEntity> : SPFieldMapper<TEntity> where TEntity : BaseSPEntity
     {
         public SPBatchMapper(IEnumerable<FieldToPropertyMapping> mappings) 
             : base(mappings)
         {
-            var batchConverters = new (Type, IConverter)[] {
+            var batchConverters = new (Type, FieldConverter)[] {
                 (typeof(DateTime), new XmlDateTimeFieldValueConverter()),
-                (typeof(SPContentTypeId), new SPContentTypeIdValueConverter()),
-                (typeof(SPFieldUserValueCollection), new SPFieldUserValueCollectionConverter()),
                 (typeof(string), new BatchStringValueConverter())
             };
 
-            RegisterUniqueConverters(batchConverters);
+            RegisterConverters(batchConverters);
         }
 
-        public void Map(SPWeb web, SPList list, StringBuilder to, BaseEntity from)
+        public void Map(SPWeb web, SPList list, StringBuilder to, BaseSPEntity from)
         {
             var fieldMappingsToFieldValues = FieldMappingsToFieldValues(web, list, from);
 
             foreach (var fieldMappingsToFieldValue in fieldMappingsToFieldValues)
             {
                 (FieldToPropertyMapping fieldMapping, object fieldValue) = fieldMappingsToFieldValue;
-                to.Append($"<SetVar Name=\"urn:schemas-microsoft-com:office:office#{fieldMapping.FieldName}\">{fieldValue}</SetVar>");
+                var commandText = $"<SetVar Name=\"urn:schemas-microsoft-com:office:office#{fieldMapping.FieldName}\">{fieldValue}</SetVar>";
+                to.Append(commandText);
             }
         }
     }

@@ -4,12 +4,12 @@ using System.Reflection;
 
 namespace SP2016.Repository.Converters.SharePoint
 {
-    public class ItemVersionDateTimeConverter : SharePointConverter
+    public class ItemVersionDateTimeConverter : SPFieldConverter
     {
-        public override object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
+        public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
             //Время в версионном представлении храниться в Гринвиче
-            SPTimeZone timeZone = web.RegionalSettings.TimeZone;
+            SPTimeZone timeZone = Web.RegionalSettings.TimeZone;
 
             // конвертирование даты и времени в локальные:
             return timeZone.UTCToLocalTime((DateTime)fieldValue);

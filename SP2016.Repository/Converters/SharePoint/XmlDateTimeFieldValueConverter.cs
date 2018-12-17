@@ -1,19 +1,18 @@
-﻿using Microsoft.SharePoint;
-using Microsoft.SharePoint.Utilities;
+﻿using Microsoft.SharePoint.Utilities;
 using System;
 using System.Reflection;
 
 namespace SP2016.Repository.Converters.SharePoint
 {
-    public class XmlDateTimeFieldValueConverter : SharePointConverter
+    public class XmlDateTimeFieldValueConverter : SPFieldConverter
     {
-        public override object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
+        public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
             DateTime value = DateTime.ParseExact(fieldValue.ToString(), "yyyy-MM-ddTHH:mm:ssZ", null).ToUniversalTime();
             return value;
         }
 
-        public override object ConvertPropertyValueToFieldValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object propertyValue)
+        public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {
             if (propertyValue is DateTime value)
             {

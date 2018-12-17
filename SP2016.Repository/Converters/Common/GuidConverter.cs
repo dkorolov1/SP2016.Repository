@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace SP2016.Repository.Converters.Common
 {
-    public class GuidConverter : SimpleConverter
+    public class GuidConverter : FieldConverter
     {
         public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {

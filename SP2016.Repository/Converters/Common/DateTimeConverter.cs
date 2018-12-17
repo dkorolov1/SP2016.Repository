@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace SP2016.Repository.Converters.Common
 {
-    public class DateTimeConverter : SimpleConverter
+    public class DateTimeConverter : FieldConverter
     {
         public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {

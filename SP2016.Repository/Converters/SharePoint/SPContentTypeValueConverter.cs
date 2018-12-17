@@ -3,11 +3,11 @@ using System.Reflection;
 
 namespace SP2016.Repository.Converters.SharePoint
 {
-    class SPContentTypeValueConverter : SharePointConverter
+    class SPContentTypeValueConverter : SPFieldConverter
     {
-        public override object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
+        public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
-            return web.ContentTypes[fieldValue.ToString()];
+            return Web.ContentTypes[fieldValue.ToString()];
         }
     }
 }

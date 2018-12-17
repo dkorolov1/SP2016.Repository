@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace SP2016.Repository.Converters.Common
 {
-    public class Int32Converter : SimpleConverter
+    public class Int32Converter : FieldConverter
     {
         public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {

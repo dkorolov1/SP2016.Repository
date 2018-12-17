@@ -4,18 +4,18 @@ using System;
 
 namespace SP2016.Repository.Converters.SharePoint
 {
-    public class BatchStringValueConverter : SharePointConverter
+    public class BatchStringValueConverter : SPFieldConverter
     {
-        public override object ConvertFieldValueToPropertyValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object fieldValue)
+        public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
-            return field.GetFieldValueAsText(fieldValue);
+            return Field.GetFieldValueAsText(fieldValue);
         }
 
-        public override object ConvertPropertyValueToFieldValue(SPWeb web, SPField field, PropertyInfo propertyInfo, object propertyValue)
+        public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {
             string value = Convert.ToString(propertyValue);
 
-            if (field.Type != SPFieldType.Note)
+            if (Field.Type != SPFieldType.Note)
                 return value;
 
             return $"<![CDATA[{value}]]>";
