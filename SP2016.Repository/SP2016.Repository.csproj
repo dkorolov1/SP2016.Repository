@@ -42,6 +42,9 @@
     <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SharePoint.Security, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SharePoint.Taxonomy, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -56,6 +59,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caml\ChainedBuilder\ChainedCamlBuilder.cs" />
+    <Compile Include="Caml\ChainedBuilder\FieldExpression.cs" />
+    <Compile Include="Caml\ChainedBuilder\FilterExpression.cs" />
+    <Compile Include="Converters\Common\JsonConverter.cs" />
     <Compile Include="Converters\SPFieldConverter.cs" />
     <Compile Include="Batch\ResultEntry.cs" />
     <Compile Include="Batch\Results.cs" />
@@ -138,6 +145,7 @@
     <Compile Include="SPFieldCalculatedValue.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="sp2016repo.snk" />
   </ItemGroup>

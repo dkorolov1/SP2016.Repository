@@ -1,4 +1,5 @@
 using SP2016.Repository.Converters;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -13,9 +14,9 @@ namespace SP2016.Repository.Mapping
 
         public bool ReadOnly { get; }
 
-        public FieldConverter Converter { get; }
+        public Type Converter { get; }
 
-        public FieldToPropertyMapping(string fieldName, PropertyInfo property, FieldConverter converter, bool readOnly)
+        public FieldToPropertyMapping(string fieldName, PropertyInfo property, Type converter, bool readOnly)
         {
             FieldName = fieldName;
             PropertyInfo = property;

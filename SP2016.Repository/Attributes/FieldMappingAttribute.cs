@@ -10,7 +10,7 @@ namespace SP2016.Repository.Attributes
 
         public string FieldName { get; }
 
-        public FieldConverter Converter { get; }
+        public Type Converter { get; }
 
         public FieldMappingAttribute(string fieldName)
         {
@@ -23,7 +23,7 @@ namespace SP2016.Repository.Attributes
             IsReadOnly = isReadOnly;
         }
 
-        public FieldMappingAttribute(string fieldName, FieldConverter converter, bool isReadOnly = false) 
+        public FieldMappingAttribute(string fieldName, Type converter, bool isReadOnly = false) 
             : this(fieldName, isReadOnly)
         {
             Converter = converter;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.SharePoint;
 using SP2016.Repository.Tests.Data.Users;
 using System;
+using System.Collections.Generic;
 
 namespace SP2016.Repository.Tests.Mock
 {
@@ -14,7 +15,12 @@ namespace SP2016.Repository.Tests.Mock
             BirthDate = new DateTime(1994, 11, 25),
             Link = null,
             JobTitle = "Software Engineer (SharePoint)",
-            Seniority = Seniority.Junior
+            Seniority = Seniority.Junior,
+            Skills = new Dictionary<string, Seniority>
+            {
+                { "PowerApps", Seniority.Senior },
+                { "SharePoint Online", Seniority.Middle }
+            }
         };
 
         public readonly UserEntity User2 = new UserEntity
@@ -22,14 +28,19 @@ namespace SP2016.Repository.Tests.Mock
             DisplayName = "Vlad L",
             Dismissed = false,
             Description = "Works with React.Js",
-            BirthDate = new DateTime(2000, 1, 15),
+            BirthDate = new DateTime(1998, 9, 20),
             Link = new SPFieldUrlValue()
             {
                 Description = "Profile in Linkedin",
                 Url = "https://www.linkedin.com/in/"
             },
             JobTitle = "Software Engineer (React.Js)",
-            Seniority = Seniority.Senior
+            Seniority = Seniority.Senior,
+            Skills = new Dictionary<string, Seniority>
+            {
+                { "ASP.NET", Seniority.Junior },
+                { "React.js", Seniority.Junior }
+            }
         };
 
         public readonly UserEntity User3 = new UserEntity
@@ -37,14 +48,19 @@ namespace SP2016.Repository.Tests.Mock
             DisplayName = "Olga M",
             Dismissed = false,
             Description = "Works with ASP.NET MVC",
-            BirthDate = new DateTime(1999, 6, 20),
+            BirthDate = new DateTime(1997, 3, 18),
             Link = new SPFieldUrlValue()
             {
                 Description = "Profile in FB",
                 Url = "https://www.facebook.com/"
             },
             JobTitle = "Software Engineer (ASP.NET MVC)",
-            Seniority = Seniority.Middle
+            Seniority = Seniority.Middle,
+            Skills = new Dictionary<string, Seniority>
+            {
+                { "ASP.NET", Seniority.Senior },
+                { "PowerBI", Seniority.Middle }
+            }
         };
 
         public readonly UserEntity User4 = new UserEntity
@@ -59,7 +75,12 @@ namespace SP2016.Repository.Tests.Mock
                 Url = "https://www.skype.com/"
             },
             JobTitle = "Software Engineer (ASP.NET Core)",
-            Seniority = Seniority.Junior
+            Seniority = Seniority.Junior,
+            Skills = new Dictionary<string, Seniority>
+            {
+                { "SharePoint Server", Seniority.Middle },
+                { "React.js", Seniority.Junior }
+            }
         };
 
         public readonly UserEntity[] AllUsers;

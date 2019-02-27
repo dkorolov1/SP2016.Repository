@@ -66,8 +66,9 @@ namespace SP2016.Repository.Mapping
 
         protected FieldConverter GetConverter(FieldToPropertyMapping mapping)
         {
-            FieldConverter converter = mapping.Converter 
-                ?? GetConverterByPropertyType(mapping.PropertyInfo);
+            FieldConverter converter = mapping.Converter is null ?
+                GetConverterByPropertyType(mapping.PropertyInfo)
+                : (FieldConverter)Activator.CreateInstance(mapping.Converter);
 
             if (converter is null)
             {
