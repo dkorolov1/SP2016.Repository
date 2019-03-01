@@ -20,7 +20,8 @@ namespace SP2016.Repository.Tests.Mock
             {
                 new Skill("PowerApps", Seniority.Senior),
                 new Skill("SharePoint Online", Seniority.Middle)
-            }
+            },
+            EducationLevel = "Higher education"
         };
 
         public readonly UserEntity User2 = new UserEntity

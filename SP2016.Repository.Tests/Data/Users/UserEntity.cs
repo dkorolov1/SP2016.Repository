@@ -35,5 +35,8 @@ namespace SP2016.Repository.Tests
 
         [FieldMapping("Skills", typeof(JsonConverter))]
         public Skill[] Skills { get; set; }
+
+        [FieldMapping("EducationLevel")]
+        public string EducationLevel { get; set; }
     }
 }
