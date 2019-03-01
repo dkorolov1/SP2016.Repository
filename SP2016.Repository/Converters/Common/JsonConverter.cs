@@ -13,7 +13,14 @@ namespace SP2016.Repository.Converters.Common
 
         public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
-            return JsonConvert.DeserializeObject(fieldValue as string, propertyInfo.PropertyType);
+            var jsonString = fieldValue as string;
+
+            if (jsonString == null)
+            {
+                return null;
+            }
+
+            return JsonConvert.DeserializeObject(jsonString, propertyInfo.PropertyType);
         }
     }
 }
