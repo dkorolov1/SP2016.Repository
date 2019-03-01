@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Reflection;
 
 namespace SP2016.Repository.Converters.Common
 {
-    public class JsonConverter<T> : FieldConverter where T : class
+    public class JsonConverter : FieldConverter
     {
         public override object ConvertPropertyValueToFieldValue(PropertyInfo propertyInfo, object propertyValue)
         {
@@ -12,7 +13,7 @@ namespace SP2016.Repository.Converters.Common
 
         public override object ConvertFieldValueToPropertyValue(PropertyInfo propertyInfo, object fieldValue)
         {
-            return JsonConvert.DeserializeObject<T>(fieldValue as string);
+            return JsonConvert.DeserializeObject(fieldValue as string, propertyInfo.PropertyType);
         }
     }
 }

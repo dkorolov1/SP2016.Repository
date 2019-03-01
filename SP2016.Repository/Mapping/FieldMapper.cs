@@ -66,6 +66,11 @@ namespace SP2016.Repository.Mapping
 
         protected FieldConverter GetConverter(FieldToPropertyMapping mapping)
         {
+            if (mapping.Converter != null && !mapping.Converter.IsSubclassOf(typeof(FieldConverter)))
+            {
+                throw new ArgumentException($"{mapping.Converter.Name} is not a subclass of FieldConverter class.");
+            }
+
             FieldConverter converter = mapping.Converter is null ?
                 GetConverterByPropertyType(mapping.PropertyInfo)
                 : (FieldConverter)Activator.CreateInstance(mapping.Converter);

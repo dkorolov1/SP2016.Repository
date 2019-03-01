@@ -73,5 +73,13 @@ function CreateUsersList() {
     $usersList.Update()  
 }
 
+function CreateRoomsList() {
+	$spWeb = Get-SPWeb -Identity $WebUrl
+	$listName = "Rooms"
+    CreateList $listName
+    $usersList = $spWeb.Lists[$listName]
+}
+
 CreateDepartmentsList
 CreateUsersList
+CreateRoomsList

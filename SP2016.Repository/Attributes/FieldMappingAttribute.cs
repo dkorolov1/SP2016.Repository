@@ -1,5 +1,4 @@
-﻿using SP2016.Repository.Converters;
-using System;
+﻿using System;
 
 namespace SP2016.Repository.Attributes
 {
@@ -17,7 +16,7 @@ namespace SP2016.Repository.Attributes
             FieldName = fieldName;
         }
 
-        public FieldMappingAttribute(string fieldName, bool isReadOnly = false) 
+        public FieldMappingAttribute(string fieldName, bool isReadOnly = false)
             : this(fieldName)
         {
             IsReadOnly = isReadOnly;

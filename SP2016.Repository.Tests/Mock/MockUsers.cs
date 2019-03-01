@@ -16,10 +16,10 @@ namespace SP2016.Repository.Tests.Mock
             Link = null,
             JobTitle = "Software Engineer (SharePoint)",
             Seniority = Seniority.Junior,
-            Skills = new Dictionary<string, Seniority>
+            Skills = new Skill[]
             {
-                { "PowerApps", Seniority.Senior },
-                { "SharePoint Online", Seniority.Middle }
+                new Skill("PowerApps", Seniority.Senior),
+                new Skill("SharePoint Online", Seniority.Middle)
             }
         };
 
@@ -36,10 +36,10 @@ namespace SP2016.Repository.Tests.Mock
             },
             JobTitle = "Software Engineer (React.Js)",
             Seniority = Seniority.Senior,
-            Skills = new Dictionary<string, Seniority>
+            Skills = new Skill[]
             {
-                { "ASP.NET", Seniority.Junior },
-                { "React.js", Seniority.Junior }
+                new Skill("ASP.NET", Seniority.Junior),
+                new Skill("React.js", Seniority.Junior)
             }
         };
 
@@ -56,10 +56,10 @@ namespace SP2016.Repository.Tests.Mock
             },
             JobTitle = "Software Engineer (ASP.NET MVC)",
             Seniority = Seniority.Middle,
-            Skills = new Dictionary<string, Seniority>
+            Skills = new Skill[]
             {
-                { "ASP.NET", Seniority.Senior },
-                { "PowerBI", Seniority.Middle }
+                new Skill("ASP.NET", Seniority.Senior),
+                new Skill("PowerBI", Seniority.Middle)
             }
         };
 
@@ -76,10 +76,10 @@ namespace SP2016.Repository.Tests.Mock
             },
             JobTitle = "Software Engineer (ASP.NET Core)",
             Seniority = Seniority.Junior,
-            Skills = new Dictionary<string, Seniority>
+            Skills = new Skill[]
             {
-                { "SharePoint Server", Seniority.Middle },
-                { "React.js", Seniority.Junior }
+                new Skill("SharePoint Server", Seniority.Middle),
+                new Skill("React.js", Seniority.Junior)
             }
         };
 

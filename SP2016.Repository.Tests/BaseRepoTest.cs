@@ -1,4 +1,5 @@
 ﻿using Microsoft.SharePoint;
+using SP2016.Repository.Tests.Data.Rooms;
 using SP2016.Repository.Tests.Mock;
 using System;
 
@@ -8,6 +9,7 @@ namespace SP2016.Repository.Tests
     {
         protected UsersRepository UsersRepository { get; private set; }
         protected DepartmentsRepository DepartmentsRepository { get; private set; }
+        protected RoomsRepository RoomsRepository { get; private set; }
         protected virtual string WebUrl => "http://wm-windows2012r/training/";
 
         protected MockUsers MockUsers { get; private set; }
@@ -20,6 +22,8 @@ namespace SP2016.Repository.Tests
 
             MockUsers = new MockUsers();
             MockDepartments = new MockDepartments();
+
+            RoomsRepository = new RoomsRepository();
         }
 
         protected void Perform(Action<SPWeb> action)
