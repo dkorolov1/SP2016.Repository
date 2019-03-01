@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
-namespace SP2016.Repository.Tests
+namespace SP2016.Repository.Tests.Repository
 {
     [TestClass]
     public class FiltersTests : BaseRepoTest
@@ -143,6 +143,53 @@ namespace SP2016.Repository.Tests
                 {
                     UsersRepository.DeleteAll(web);
                     UsersRepository.DeleteFolder(web, folderName);
+                }
+            });
+        }
+
+        [TestMethod]
+        public void GetBySeniorityAndJobTitle_WithSpecificSeniorityAndJobKeyWord_ReturnsOneEmployee()
+        {
+            Perform(web =>
+            {
+                try
+                {
+                    UsersRepository.AddRange(web, MockUsers.AllUsers);
+
+                    var aspMiddleDevelopers = UsersRepository.GetBySeniorityAndJobTitle(web, Data.Users.Seniority.Middle, "ASP");
+
+                    var olga = aspMiddleDevelopers[0];
+
+                    Assert.AreEqual(1, aspMiddleDevelopers.Length);
+                    Assert.AreEqual("Olga M", olga.DisplayName);
+
+                }
+                finally
+                {
+                    UsersRepository.DeleteAll(web);
+                }
+            });
+        }
+
+        [TestMethod]
+        public void GetByAgeWithDisplayName_WithSpecificAge_ReturnsItemsWithDisplayNameOnly()
+        {
+            Perform(web =>
+            {
+                try
+                {
+                    UsersRepository.AddRange(web, MockUsers.AllUsers);
+
+                    var adultDevelopers = UsersRepository.GetByAgeWithDisplayName(web, 23);
+
+                    Assert.AreEqual(2, adultDevelopers.Length);
+
+                    Assert.IsNotNull(adultDevelopers[0].DisplayName);
+
+                }
+                finally
+                {
+                    UsersRepository.DeleteAll(web);
                 }
             });
         }

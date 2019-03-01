@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace SP2016.Repository.Tests
+namespace SP2016.Repository.Tests.Repository
 {
     [TestClass]
     public class UpdatingItemsTests : BaseRepoTest

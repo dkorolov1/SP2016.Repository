@@ -41,6 +41,12 @@ function CreateUsersList() {
     $newField.RichTextMode = "FullHtml"
     $newField.Update()
 
+	#Skills Field
+	$newFieldName = $usersList.Fields.Add("Skills", [Microsoft.SharePoint.SPFieldType]::Note, $false)
+    $newField = $usersList.Fields.GetFieldByInternalName($newFieldName)
+    $newField.RichText = $false
+    $newField.Update()
+
 	#BirthDate Field
 	$usersList.Fields.Add("BirthDate", [Microsoft.SharePoint.SPFieldType]::DateTime, $false)
 
@@ -67,5 +73,13 @@ function CreateUsersList() {
     $usersList.Update()  
 }
 
+function CreateRoomsList() {
+	$spWeb = Get-SPWeb -Identity $WebUrl
+	$listName = "Rooms"
+    CreateList $listName
+    $usersList = $spWeb.Lists[$listName]
+}
+
 CreateDepartmentsList
 CreateUsersList
+CreateRoomsList

@@ -1,5 +1,6 @@
 ﻿using Microsoft.SharePoint;
 using SP2016.Repository.Attributes;
+using SP2016.Repository.Converters.Common;
 using SP2016.Repository.Entities;
 using SP2016.Repository.Tests.Data.Users;
 using System;
@@ -31,5 +32,8 @@ namespace SP2016.Repository.Tests
 
         [FieldMapping("Seniority")]
         public Seniority Seniority { get; set; }
+
+        [FieldMapping("Skills", typeof(JsonConverter))]
+        public Skill[] Skills { get; set; }
     }
 }
